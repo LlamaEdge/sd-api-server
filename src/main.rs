@@ -28,8 +28,11 @@ const DEFAULT_SOCKET_ADDRESS: &str = "0.0.0.0:8080";
 #[command(name = "LlamaEdge-RAG API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "LlamaEdge-Stable-Diffusion API Server")]
 struct Cli {
     /// Sets names for chat and embedding models. The names are separated by comma without space, for example, '--model-name Llama-2-7b,all-minilm'.
-    #[arg(short, long, value_delimiter = ',', required = true)]
-    model_name: Vec<String>,
+    #[arg(short, long, required = true)]
+    model_name: String,
+    /// Sets the gguf filename.
+    #[arg(short, long, required = true)]
+    gguf: String,
     /// Socket address of LlamaEdge API Server instance
     #[arg(long, default_value = DEFAULT_SOCKET_ADDRESS)]
     socket_addr: String,
@@ -59,20 +62,20 @@ async fn main() -> Result<(), ServerError> {
     // log the version of the server
     info!(target: "server_config", "server version: {}", env!("CARGO_PKG_VERSION"));
 
-    // log model names
-    if cli.model_name.is_empty() {
-        return Err(ServerError::ArgumentError(
-            "Invalid setting for model name.".to_owned(),
-        ));
-    }
-    info!(target: "server_config", "model_name: {}", cli.model_name.join(",").to_string());
+    // log model name
+    info!(target: "server_config", "model_name: {}", cli.model_name);
+
+    // log gguf filename
+    info!(target: "server_config", "gguf: {}", cli.gguf);
+
+    // initialize the stable diffusion context
+    llama_core::init_stable_diffusion_context(&cli.gguf);
 
     // socket address
     let addr = cli
         .socket_addr
         .parse::<SocketAddr>()
         .map_err(|e| ServerError::SocketAddr(e.to_string()))?;
-    let port = addr.port().to_string();
 
     // log socket address
     info!(target: "server_config", "socket_address: {}", addr.to_string());

@@ -1,5 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+pub(crate) fn gen_image_id() -> String {
+    format!("imgen-{}", uuid::Uuid::new_v4())
+}
+
 #[derive(
     Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, clap::ValueEnum, Serialize, Deserialize,
 )]
