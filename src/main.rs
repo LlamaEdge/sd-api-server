@@ -10,13 +10,11 @@ use clap::Parser;
 use error::ServerError;
 use hyper::{
     body::HttpBody,
-    header,
     server::conn::AddrStream,
     service::{make_service_fn, service_fn},
-    Body, Request, Response, Server, StatusCode,
+    Body, Request, Response, Server,
 };
-use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, net::SocketAddr, path::PathBuf};
+use std::{net::SocketAddr, path::PathBuf};
 use utils::LogLevel;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -27,10 +25,10 @@ const DEFAULT_SOCKET_ADDRESS: &str = "0.0.0.0:8080";
 #[derive(Debug, Parser)]
 #[command(name = "LlamaEdge-RAG API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "LlamaEdge-Stable-Diffusion API Server")]
 struct Cli {
-    /// Sets names for chat and embedding models. The names are separated by comma without space, for example, '--model-name Llama-2-7b,all-minilm'.
+    /// Sets the model name.
     #[arg(short, long, required = true)]
     model_name: String,
-    /// Sets the gguf filename.
+    /// Sets the gguf model file with the '.gguf' extension.
     #[arg(short, long, required = true)]
     gguf: String,
     /// Socket address of LlamaEdge API Server instance
@@ -40,17 +38,11 @@ struct Cli {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), ServerError> {
-    let mut plugin_debug = false;
-
     // get the environment variable `LLAMA_LOG`
     let log_level: LogLevel = std::env::var("LLAMA_LOG")
         .unwrap_or("info".to_string())
         .parse()
         .unwrap_or(LogLevel::Info);
-
-    if log_level == LogLevel::Debug || log_level == LogLevel::Trace {
-        plugin_debug = true;
-    }
 
     // set global logger
     wasi_logger::Logger::install().expect("failed to install wasi_logger::Logger");
@@ -62,14 +54,26 @@ async fn main() -> Result<(), ServerError> {
     // log the version of the server
     info!(target: "server_config", "server version: {}", env!("CARGO_PKG_VERSION"));
 
+    if !cli.model_name.is_empty() {
+        return Err(ServerError::ArgumentError(
+            "The value of the '--model-name' option should not be empty.".into(),
+        ));
+    }
     // log model name
     info!(target: "server_config", "model_name: {}", cli.model_name);
 
+    if !cli.gguf.ends_with(".gguf") {
+        return Err(ServerError::ArgumentError(
+            "The value of the '--gguf' option should be a gguf file with the '.gguf' extension."
+                .into(),
+        ));
+    }
     // log gguf filename
     info!(target: "server_config", "gguf: {}", cli.gguf);
 
     // initialize the stable diffusion context
-    llama_core::init_stable_diffusion_context(&cli.gguf);
+    llama_core::init_stable_diffusion_context(&cli.gguf)
+        .map_err(|e| ServerError::Operation(format!("{}", e)))?;
 
     // socket address
     let addr = cli
