@@ -16,3 +16,4 @@ thiserror = "1"
 llama-core = { path = "/Volumes/Dev/secondstate/me/LlamaEdge/api-server/llama-core" }
 endpoints = { path = "/Volumes/Dev/secondstate/me/LlamaEdge/api-server/endpoints" }
 uuid = { version = "1.4", features = ["v4", "fast-rng", "macro-diagnostics"] }
+multipart-2021 = "0.19.0"

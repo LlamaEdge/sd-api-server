@@ -33,6 +33,24 @@ pub(crate) fn internal_server_error(msg: impl AsRef<str>) -> Response<Body> {
         .unwrap()
 }
 
+pub(crate) fn method_not_allowed(msg: impl AsRef<str>) -> Response<Body> {
+    let err_msg = match msg.as_ref().is_empty() {
+        true => "405 Method Not Allowed".to_string(),
+        false => format!("405 Method Not Allowed: {}", msg.as_ref()),
+    };
+
+    // log error
+    error!(target: "response", "{}", &err_msg);
+
+    Response::builder()
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Methods", "*")
+        .header("Access-Control-Allow-Headers", "*")
+        .status(hyper::StatusCode::METHOD_NOT_ALLOWED)
+        .body(Body::from(err_msg))
+        .unwrap()
+}
+
 pub(crate) fn bad_request(msg: impl AsRef<str>) -> Response<Body> {
     let err_msg = match msg.as_ref().is_empty() {
         true => "400 Bad Request".to_string(),
