@@ -146,7 +146,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
 
             let mut multipart = Multipart::with_body(cursor, boundary.unwrap());
 
-            let mut request = ImageEditRequest::default();
+            let mut image_request = ImageEditRequest::default();
             while let ReadEntryResult::Entry(mut field) = multipart.read_entry_mut() {
                 match &*field.headers.name {
                     "image" => {
@@ -222,7 +222,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             };
 
                         // create a file object
-                        request.image = FileObject {
+                        image_request.image = FileObject {
                             id,
                             bytes: size_in_bytes as u64,
                             created_at,
@@ -244,7 +244,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 return error::internal_server_error(err_msg);
                             }
 
-                            request.prompt = prompt;
+                            image_request.prompt = prompt;
                         }
                         false => {
                             let err_msg =
@@ -329,7 +329,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             };
 
                         // create a file object
-                        request.mask = Some(FileObject {
+                        image_request.mask = Some(FileObject {
                             id,
                             bytes: size_in_bytes as u64,
                             created_at,
@@ -351,7 +351,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 return error::internal_server_error(err_msg);
                             }
 
-                            request.model = model;
+                            image_request.model = model;
                         }
                         false => {
                             let err_msg =
@@ -377,7 +377,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             }
 
                             match n.parse::<u64>() {
-                                Ok(n) => request.n = Some(n),
+                                Ok(n) => image_request.n = Some(n),
                                 Err(e) => {
                                     let err_msg = format!(
                                         "Failed to parse the number of images. Reason: {}",
@@ -414,7 +414,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 return error::internal_server_error(err_msg);
                             }
 
-                            request.size = Some(size);
+                            image_request.size = Some(size);
                         }
                         false => {
                             let err_msg =
@@ -440,7 +440,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             }
 
                             match response_format.parse::<ResponseFormat>() {
-                                Ok(format) => request.response_format = Some(format),
+                                Ok(format) => image_request.response_format = Some(format),
                                 Err(e) => {
                                     let err_msg = format!(
                                         "Failed to parse the response format. Reason: {}",
@@ -477,7 +477,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 return error::internal_server_error(err_msg);
                             }
 
-                            request.user = Some(user);
+                            image_request.user = Some(user);
                         }
                         false => {
                             let err_msg =
@@ -494,9 +494,63 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
             }
 
             // log
-            println!("[INFO] image edit request: {:?}", &request);
+            info!(target: "image_edit_handler", "image edit request: {:?}", &image_request);
 
-            unimplemented!()
+            // check if the user id is provided
+            if image_request.user.is_none() {
+                image_request.user = Some(gen_image_id())
+            };
+            let id = image_request.user.clone().unwrap();
+
+            // log user id
+            info!(target: "image_edit_handler", "user: {}", image_request.user.clone().unwrap());
+
+            match llama_core::images::image_edit(&mut image_request) {
+                Ok(images_response) => {
+                    match serde_json::to_string(&images_response) {
+                        Ok(s) => {
+                            // return response
+                            let result = Response::builder()
+                                .header("Access-Control-Allow-Origin", "*")
+                                .header("Access-Control-Allow-Methods", "*")
+                                .header("Access-Control-Allow-Headers", "*")
+                                .header("Content-Type", "application/json")
+                                .header("user", id)
+                                .body(Body::from(s));
+                            match result {
+                                Ok(response) => response,
+                                Err(e) => {
+                                    let err_msg = e.to_string();
+
+                                    // log
+                                    error!(target: "image_edit_handler", "{}", &err_msg);
+
+                                    error::internal_server_error(err_msg)
+                                }
+                            }
+                        }
+                        Err(e) => {
+                            let err_msg = format!(
+                                "Fail to serialize the `ListImagesResponse` instance. {}",
+                                e
+                            );
+
+                            // log
+                            error!(target: "image_edit_handler", "{}", &err_msg);
+
+                            error::internal_server_error(err_msg)
+                        }
+                    }
+                }
+                Err(e) => {
+                    let err_msg = format!("Failed to get image edit result. Reason: {}", e);
+
+                    // log
+                    error!(target: "image_edit_handler", "{}", &err_msg);
+
+                    error::internal_server_error(err_msg)
+                }
+            }
         }
         _ => error::method_not_allowed(req.method().to_string()),
     };
