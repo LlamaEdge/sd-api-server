@@ -1109,6 +1109,7 @@ dependencies = [
  "endpoints",
  "futures",
  "futures-util",
+ "log 0.4.22",
  "once_cell",
  "qdrant_rest_client",
  "regex",
@@ -1119,6 +1120,7 @@ dependencies = [
  "thiserror",
  "tiktoken-rs",
  "uuid",
+ "wasi-logger",
  "wasmedge-wasi-nn",
  "wasmedge_stable_diffusion",
 ]
