@@ -52,15 +52,15 @@ async fn main() -> Result<(), ServerError> {
     let cli = Cli::parse();
 
     // log the version of the server
-    info!(target: "server_config", "server version: {}", env!("CARGO_PKG_VERSION"));
+    info!(target: "stdout", "server version: {}", env!("CARGO_PKG_VERSION"));
 
-    if !cli.model_name.is_empty() {
+    if cli.model_name.is_empty() {
         return Err(ServerError::ArgumentError(
             "The value of the '--model-name' option should not be empty.".into(),
         ));
     }
     // log model name
-    info!(target: "server_config", "model_name: {}", cli.model_name);
+    info!(target: "stdout", "model_name: {}", cli.model_name);
 
     if !cli.gguf.ends_with(".gguf") {
         return Err(ServerError::ArgumentError(
@@ -69,7 +69,7 @@ async fn main() -> Result<(), ServerError> {
         ));
     }
     // log gguf filename
-    info!(target: "server_config", "gguf: {}", cli.gguf);
+    info!(target: "stdout", "gguf: {}", cli.gguf);
 
     // initialize the stable diffusion context
     llama_core::init_stable_diffusion_context(&cli.gguf)
@@ -82,7 +82,7 @@ async fn main() -> Result<(), ServerError> {
         .map_err(|e| ServerError::SocketAddr(e.to_string()))?;
 
     // log socket address
-    info!(target: "server_config", "socket_address: {}", addr.to_string());
+    info!(target: "stdout", "socket_address: {}", addr.to_string());
 
     let new_service = make_service_fn(move |conn: &AddrStream| {
         // log socket address
