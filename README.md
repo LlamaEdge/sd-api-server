@@ -34,7 +34,7 @@ cargo build --target wasm32-wasip1 --release
 - Send a request for image generation
 
   ```bash
-  curl -X POST 'http://localhost:10086/v1/images/generations' \
+  curl -X POST 'http://localhost:8080/v1/images/generations' \
     --header 'Content-Type: application/json' \
     --data '{
         "model": "sd-v1.4",
