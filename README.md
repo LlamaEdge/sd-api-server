@@ -1,7 +1,30 @@
 # Stable-Diffusion-API-Server
 
-> [!NOTE]
-> WasmEdge-0.14.1-rc.1 with `wasmedge_stablediffusion` and `wasmedge_logging` plugins is required to run the server.
+This project is a RESTful API server that provides image generation and editing services based on Stable Diffusion models.
+
+## Setup
+
+- Install WasmEdge v0.14.1-rc.1
+
+  ```bash
+  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1-rc.1 --nowasilogging
+  ```
+
+- Install `wasmedge_stablediffusion` and `wasmedge_logging` plugins
+
+  ```bash
+  # Download stable diffusion plugin for Mac Apple Silicon
+  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.1/WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.1-darwin_arm64.tar.gz
+
+  # Unzip the plugin to $HOME/.wasmedge/plugin
+  tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.1-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
+
+  # Download logging plugin for Mac Apple Silicon
+  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-beta.2/WasmEdge-plugin-wasi_logging-0.14.1-beta.2-darwin_arm64.tar.gz
+
+  # Unzip the plugin to $HOME/.wasmedge/plugin
+  tar -xzf WasmEdge-plugin-wasi_logging-0.14.1-beta.2-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
+  ```
 
 ## Build
 
@@ -18,6 +41,12 @@ cargo build --target wasm32-wasip1 --release
   ```bash
   curl -LO https://huggingface.co/second-state/stable-diffusion-v-1-4-GGUF/resolve/main/stable-diffusion-v1-4-Q8_0.gguf
   ```
+
+  The available stable diffusion models:
+
+  - [second-state/stable-diffusion-v-1-4-GGUF](https://huggingface.co/second-state/stable-diffusion-v-1-4-GGUF)
+  - [second-state/stable-diffusion-v1-5-GGUF](https://huggingface.co/second-state/stable-diffusion-v1-5-GGUF)
+  - [second-state/stable-diffusion-2-1-GGUF](https://huggingface.co/second-state/stable-diffusion-2-1-GGUF)
 
 - Start the server
 
