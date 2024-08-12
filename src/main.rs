@@ -118,9 +118,9 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
                 None => 0,
             };
 
-            info!(target: "request", "method: {}, endpoint: {}, http_version: {}, content-length: {}", method, path, version, size);
+            info!(target: "stdout", "method: {}, endpoint: {}, http_version: {}, content-length: {}", method, path, version, size);
         } else {
-            info!(target: "request", "method: {}, endpoint: {}, http_version: {}", method, path, version);
+            info!(target: "stdout", "method: {}, endpoint: {}, http_version: {}", method, path, version);
         }
     }
 
@@ -144,7 +144,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
             let response_is_client_error = status_code.is_client_error();
             let response_is_server_error = status_code.is_server_error();
 
-            info!(target: "response", "version: {}, body_size: {}, status: {}, is_informational: {}, is_success: {}, is_redirection: {}, is_client_error: {}, is_server_error: {}", response_version, response_body_size, response_status, response_is_informational, response_is_success, response_is_redirection, response_is_client_error, response_is_server_error);
+            info!(target: "stdout", "version: {}, body_size: {}, status: {}, is_informational: {}, is_success: {}, is_redirection: {}, is_client_error: {}, is_server_error: {}", response_version, response_body_size, response_status, response_is_informational, response_is_success, response_is_redirection, response_is_client_error, response_is_server_error);
         } else {
             let response_version = format!("{:?}", response.version());
             let response_body_size: u64 = response.body().size_hint().lower();
@@ -155,7 +155,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
             let response_is_client_error = status_code.is_client_error();
             let response_is_server_error = status_code.is_server_error();
 
-            error!(target: "response", "version: {}, body_size: {}, status: {}, is_informational: {}, is_success: {}, is_redirection: {}, is_client_error: {}, is_server_error: {}", response_version, response_body_size, response_status, response_is_informational, response_is_success, response_is_redirection, response_is_client_error, response_is_server_error);
+            error!(target: "stdout", "version: {}, body_size: {}, status: {}, is_informational: {}, is_success: {}, is_redirection: {}, is_client_error: {}, is_server_error: {}", response_version, response_body_size, response_status, response_is_informational, response_is_success, response_is_redirection, response_is_client_error, response_is_server_error);
         }
     }
 

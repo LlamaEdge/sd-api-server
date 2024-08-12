@@ -15,7 +15,7 @@ use std::{
 
 pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response<Body> {
     // log
-    info!(target: "image_generation_handler", "Handling the coming image generation request");
+    info!(target: "stdout", "Handling the coming image generation request");
 
     if req.method().eq(&hyper::http::Method::OPTIONS) {
         let result = Response::builder()
@@ -31,7 +31,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                 let err_msg = e.to_string();
 
                 // log
-                error!(target: "image_generation_handler", "{}", &err_msg);
+                error!(target: "stdout", "{}", &err_msg);
 
                 return error::internal_server_error(err_msg);
             }
@@ -39,7 +39,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
     }
 
     let res = if req.method() == Method::POST {
-        info!(target: "image_generation_handler", "Prepare the image generation request.");
+        info!(target: "stdout", "Prepare the image generation request.");
 
         // parse request
         let body_bytes = match to_bytes(req.body_mut()).await {
@@ -48,7 +48,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                 let err_msg = format!("Fail to read buffer from request body. {}", e);
 
                 // log
-                error!(target: "image_generation_handler", "{}", &err_msg);
+                error!(target: "stdout", "{}", &err_msg);
 
                 return error::internal_server_error(err_msg);
             }
@@ -59,7 +59,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                 let err_msg = format!("Fail to deserialize image create request: {msg}", msg = e);
 
                 // log
-                error!(target: "image_generation_handler", "{}", &err_msg);
+                error!(target: "stdout", "{}", &err_msg);
 
                 return error::bad_request(err_msg);
             }
@@ -72,7 +72,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
         let id = image_request.user.clone().unwrap();
 
         // log user id
-        info!(target: "image_generation_handler", "user: {}", image_request.user.clone().unwrap());
+        info!(target: "stdout", "user: {}", image_request.user.clone().unwrap());
 
         let res = match llama_core::images::image_generation(&mut image_request).await {
             Ok(images_response) => {
@@ -93,7 +93,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                                 let err_msg = e.to_string();
 
                                 // log
-                                error!(target: "image_generation_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 error::internal_server_error(err_msg)
                             }
@@ -104,7 +104,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                             format!("Fail to serialize the `ListImagesResponse` instance. {}", e);
 
                         // log
-                        error!(target: "image_generation_handler", "{}", &err_msg);
+                        error!(target: "stdout", "{}", &err_msg);
 
                         error::internal_server_error(err_msg)
                     }
@@ -114,7 +114,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                 let err_msg = format!("Failed to get image generations. Reason: {}", e);
 
                 // log
-                error!(target: "image_generation_handler", "{}", &err_msg);
+                error!(target: "stdout", "{}", &err_msg);
 
                 error::internal_server_error(err_msg)
             }
@@ -125,20 +125,20 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
         let err_msg = "Invalid HTTP Method.";
 
         // log
-        error!(target: "image_generation_handler", "{}", &err_msg);
+        error!(target: "stdout", "{}", &err_msg);
 
         error::internal_server_error(err_msg)
     };
 
     // log
-    info!(target: "image_generation_handler", "Send the image generation response.");
+    info!(target: "stdout", "Send the image generation response.");
 
     res
 }
 
 pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
     // log
-    info!(target: "image_edit_handler", "Handling the coming image generation request");
+    info!(target: "stdout", "Handling the coming image generation request");
 
     if req.method().eq(&hyper::http::Method::OPTIONS) {
         let result = Response::builder()
@@ -154,7 +154,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                 let err_msg = e.to_string();
 
                 // log
-                error!(target: "image_edit_handler", "{}", &err_msg);
+                error!(target: "stdout", "{}", &err_msg);
 
                 return error::internal_server_error(err_msg);
             }
@@ -178,7 +178,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                     let err_msg = format!("Fail to read buffer from request body. {}", e);
 
                     // log
-                    error!(target: "image_edit_handler", "{}", &err_msg);
+                    error!(target: "stdout", "{}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
@@ -199,7 +199,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                     "Failed to upload the image file. The filename is not provided.";
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -213,7 +213,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 let err_msg = format!("Failed to read the image file. {}", e);
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -240,7 +240,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 );
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -248,7 +248,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                         file.write_all(&buffer[..]).unwrap();
 
                         // log
-                        info!(target: "image_edit_handler", "file_id: {}, file_name: {}, size in bytes: {}", &id, &filename, size_in_bytes);
+                        info!(target: "stdout", "file_id: {}, file_name: {}, size in bytes: {}", &id, &filename, size_in_bytes);
 
                         let created_at =
                             match SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
@@ -257,7 +257,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                     let err_msg = "Failed to get the current time.";
 
                                     // log
-                                    error!(target: "image_edit_handler", "{}", err_msg);
+                                    error!(target: "stdout", "{}", err_msg);
 
                                     return error::internal_server_error(err_msg);
                                 }
@@ -281,7 +281,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 let err_msg = format!("Failed to read the prompt. {}", e);
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -293,7 +293,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 "Failed to get the prompt. The prompt field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_edit_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -306,7 +306,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                     "Failed to upload the image mask file. The filename is not provided.";
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -320,7 +320,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 let err_msg = format!("Failed to read the image mask file. {}", e);
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -347,7 +347,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 );
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -355,7 +355,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                         file.write_all(&buffer[..]).unwrap();
 
                         // log
-                        info!(target: "image_edit_handler", "file_id: {}, file_name: {}, size in bytes: {}", &id, &filename, size_in_bytes);
+                        info!(target: "stdout", "file_id: {}, file_name: {}, size in bytes: {}", &id, &filename, size_in_bytes);
 
                         let created_at =
                             match SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
@@ -364,7 +364,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                     let err_msg = "Failed to get the current time.";
 
                                     // log
-                                    error!(target: "image_edit_handler", "{}", err_msg);
+                                    error!(target: "stdout", "{}", err_msg);
 
                                     return error::internal_server_error(err_msg);
                                 }
@@ -388,7 +388,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 let err_msg = format!("Failed to read the model. {}", e);
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -400,7 +400,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 "Failed to get the model name. The model field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_edit_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -413,7 +413,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 let err_msg = format!("Failed to read the number of images. {}", e);
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -427,7 +427,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                     );
 
                                     // log
-                                    error!(target: "image_edit_handler", "{}", &err_msg);
+                                    error!(target: "stdout", "{}", &err_msg);
 
                                     return error::bad_request(err_msg);
                                 }
@@ -438,7 +438,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             "Failed to get the number of images. The n field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_edit_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -451,7 +451,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 let err_msg = format!("Failed to read the size. {}", e);
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -463,7 +463,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 "Failed to get the size. The size field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_edit_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -476,7 +476,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 let err_msg = format!("Failed to read the response format. {}", e);
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -490,7 +490,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                     );
 
                                     // log
-                                    error!(target: "image_edit_handler", "{}", &err_msg);
+                                    error!(target: "stdout", "{}", &err_msg);
 
                                     return error::bad_request(err_msg);
                                 }
@@ -501,7 +501,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 "Failed to get the response format. The response format field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_edit_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -514,7 +514,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 let err_msg = format!("Failed to read the user. {}", e);
 
                                 // log
-                                error!(target: "image_edit_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -526,7 +526,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                 "Failed to get the user. The user field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_edit_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -536,7 +536,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
             }
 
             // log
-            info!(target: "image_edit_handler", "image edit request: {:?}", &image_request);
+            info!(target: "stdout", "image edit request: {:?}", &image_request);
 
             // check if the user id is provided
             if image_request.user.is_none() {
@@ -545,7 +545,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
             let id = image_request.user.clone().unwrap();
 
             // log user id
-            info!(target: "image_edit_handler", "user: {}", image_request.user.clone().unwrap());
+            info!(target: "stdout", "user: {}", image_request.user.clone().unwrap());
 
             match llama_core::images::image_edit(&mut image_request).await {
                 Ok(images_response) => {
@@ -565,7 +565,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                                     let err_msg = e.to_string();
 
                                     // log
-                                    error!(target: "image_edit_handler", "{}", &err_msg);
+                                    error!(target: "stdout", "{}", &err_msg);
 
                                     error::internal_server_error(err_msg)
                                 }
@@ -578,7 +578,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             );
 
                             // log
-                            error!(target: "image_edit_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             error::internal_server_error(err_msg)
                         }
@@ -588,7 +588,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                     let err_msg = format!("Failed to get image edit result. Reason: {}", e);
 
                     // log
-                    error!(target: "image_edit_handler", "{}", &err_msg);
+                    error!(target: "stdout", "{}", &err_msg);
 
                     error::internal_server_error(err_msg)
                 }
@@ -598,14 +598,14 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
     };
 
     // log
-    info!(target: "image_edit_handler", "Send the image edit response.");
+    info!(target: "stdout", "Send the image edit response.");
 
     res
 }
 
 pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body> {
     // log
-    info!(target: "image_variation_handler", "Handling the coming image variation request");
+    info!(target: "stdout", "Handling the coming image variation request");
 
     if req.method().eq(&hyper::http::Method::OPTIONS) {
         let result = Response::builder()
@@ -621,7 +621,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                 let err_msg = e.to_string();
 
                 // log
-                error!(target: "image_variation_handler", "{}", &err_msg);
+                error!(target: "stdout", "{}", &err_msg);
 
                 return error::internal_server_error(err_msg);
             }
@@ -645,7 +645,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                     let err_msg = format!("Fail to read buffer from request body. {}", e);
 
                     // log
-                    error!(target: "image_variation_handler", "{}", &err_msg);
+                    error!(target: "stdout", "{}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
@@ -666,7 +666,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                     "Failed to upload the image file. The filename is not provided.";
 
                                 // log
-                                error!(target: "image_variation_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -680,7 +680,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 let err_msg = format!("Failed to read the image file. {}", e);
 
                                 // log
-                                error!(target: "image_variation_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -707,7 +707,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 );
 
                                 // log
-                                error!(target: "image_variation_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -715,7 +715,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                         file.write_all(&buffer[..]).unwrap();
 
                         // log
-                        info!(target: "image_variation_handler", "file_id: {}, file_name: {}, size in bytes: {}", &id, &filename, size_in_bytes);
+                        info!(target: "stdout", "file_id: {}, file_name: {}, size in bytes: {}", &id, &filename, size_in_bytes);
 
                         let created_at =
                             match SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
@@ -724,7 +724,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                     let err_msg = "Failed to get the current time.";
 
                                     // log
-                                    error!(target: "image_variation_handler", "{}", err_msg);
+                                    error!(target: "stdout", "{}", err_msg);
 
                                     return error::internal_server_error(err_msg);
                                 }
@@ -748,7 +748,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 let err_msg = format!("Failed to read the model. {}", e);
 
                                 // log
-                                error!(target: "image_variation_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -760,7 +760,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 "Failed to get the model name. The model field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_variation_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -773,7 +773,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 let err_msg = format!("Failed to read the number of images. {}", e);
 
                                 // log
-                                error!(target: "image_variation_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -787,7 +787,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                     );
 
                                     // log
-                                    error!(target: "image_variation_handler", "{}", &err_msg);
+                                    error!(target: "stdout", "{}", &err_msg);
 
                                     return error::bad_request(err_msg);
                                 }
@@ -798,7 +798,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                             "Failed to get the number of images. The n field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_variation_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -811,7 +811,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 let err_msg = format!("Failed to read the response format. {}", e);
 
                                 // log
-                                error!(target: "image_variation_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -825,7 +825,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                     );
 
                                     // log
-                                    error!(target: "image_variation_handler", "{}", &err_msg);
+                                    error!(target: "stdout", "{}", &err_msg);
 
                                     return error::bad_request(err_msg);
                                 }
@@ -836,7 +836,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 "Failed to get the response format. The response format field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_variation_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -849,7 +849,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 let err_msg = format!("Failed to read the size. {}", e);
 
                                 // log
-                                error!(target: "image_variation_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -861,7 +861,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 "Failed to get the size. The size field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_variation_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -874,7 +874,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 let err_msg = format!("Failed to read the user. {}", e);
 
                                 // log
-                                error!(target: "image_variation_handler", "{}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -886,7 +886,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                 "Failed to get the user. The user field in the request should be a text field.";
 
                             // log
-                            error!(target: "image_variation_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -896,7 +896,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
             }
 
             // log
-            info!(target: "image_variation_handler", "image variation request: {:?}", &image_request);
+            info!(target: "stdout", "image variation request: {:?}", &image_request);
 
             // check if the user id is provided
             if image_request.user.is_none() {
@@ -905,7 +905,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
             let id = image_request.user.clone().unwrap();
 
             // log user id
-            info!(target: "image_variation_handler", "user: {}", image_request.user.clone().unwrap());
+            info!(target: "stdout", "user: {}", image_request.user.clone().unwrap());
 
             match llama_core::images::image_variation(&mut image_request).await {
                 Ok(images_response) => {
@@ -925,7 +925,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                                     let err_msg = e.to_string();
 
                                     // log
-                                    error!(target: "image_variation_handler", "{}", &err_msg);
+                                    error!(target: "stdout", "{}", &err_msg);
 
                                     error::internal_server_error(err_msg)
                                 }
@@ -938,7 +938,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                             );
 
                             // log
-                            error!(target: "image_variation_handler", "{}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             error::internal_server_error(err_msg)
                         }
@@ -948,7 +948,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                     let err_msg = format!("Failed to get image edit result. Reason: {}", e);
 
                     // log
-                    error!(target: "image_variation_handler", "{}", &err_msg);
+                    error!(target: "stdout", "{}", &err_msg);
 
                     error::internal_server_error(err_msg)
                 }
@@ -958,7 +958,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
     };
 
     // log
-    info!(target: "image_variation_handler", "Send the image variation response.");
+    info!(target: "stdout", "Send the image variation response.");
 
     res
 }
