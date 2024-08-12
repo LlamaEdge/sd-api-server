@@ -42,10 +42,21 @@ cargo build --target wasm32-wasip1 --release
     }'
   ```
 
-- Preview the generated image with [Base64.Guru online tool](https://base64.guru/converter/decode/image)
+  If the request is handled successfully, the server will return a JSON response like the following:
 
-  The following snapshot is an example of the generated image shown in the online tool.
+  ```json
+  {
+    "created": 1723431133,
+    "data": [
+        {
+            "url": "/archives/file_74f514a2-8d33-4f9d-bcc0-42e8db14ecbc/output.png",
+            "prompt": "A cute baby sea otter"
+        }
+    ]
+  }
+  ```
 
+- Preview the generated image
 
 <div align=center>
 <img src="image/otter.png" alt="A cute baby sea otter" width="60%" />
@@ -61,9 +72,21 @@ cargo build --target wasm32-wasip1 --release
     --form 'prompt="A cute baby sea otter with blue eyes"'
   ```
 
-- Preview the edited image with [Base64.Guru online tool](https://base64.guru/converter/decode/image)
+  If the request is handled successfully, the server will return a JSON response like the following:
 
-  The following snapshot is an example of the edited image shown in the online tool.
+  ```json
+  {
+    "created": 1723432689,
+    "data": [
+        {
+            "url": "/archives/file_554e4d53-6072-4988-83e6-fe684655a734/output.png",
+            "prompt": "A cute baby sea otter with blue eyes"
+        }
+    ]
+  }
+  ```
+
+- Preview the edited image
 
 <div align=center>
 <img src="image/otter_blue_eyes.png" alt="A cute baby sea otter with blue eyes" width="60%" />
