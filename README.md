@@ -30,6 +30,8 @@ This project is a RESTful API server that provides image generation and editing 
 
 ```bash
 cargo build --target wasm32-wasip1 --release
+
+cp target/wasm32-wasip1/release/sd-api-server.wasm .
 ```
 
 `sd-api-server.wasm` will be generated in `target/wasm32-wasip1/release/`.
