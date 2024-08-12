@@ -1,6 +1,6 @@
 # Stable-Diffusion-API-Server
 
-This project is a RESTful API server that provides image generation and editing services based on Stable Diffusion models.
+This project is a RESTful API server that provides image generation and editing services based on Stable Diffusion models. The APIs are compatible with OpenAI APIs of [image generation and editing](https://platform.openai.com/docs/api-reference/images).
 
 ## Setup
 
