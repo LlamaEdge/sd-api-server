@@ -46,4 +46,25 @@ cargo build --target wasm32-wasip1 --release
 
   The following snapshot is an example of the generated image shown in the online tool.
 
-  ![alt text](image/image.png)
+
+<div align=center>
+<img src="image/otter.png" alt="A cute baby sea otter" width="60%" />
+</div>
+
+### Image Editing
+
+- Send a request for image editing
+
+  ```bash
+  curl --location 'http://localhost:10086/v1/images/edits' \
+    --form 'image=@"otter.png"' \
+    --form 'prompt="A cute baby sea otter with blue eyes"'
+  ```
+
+- Preview the edited image with [Base64.Guru online tool](https://base64.guru/converter/decode/image)
+
+  The following snapshot is an example of the edited image shown in the online tool.
+
+<div align=center>
+<img src="image/otter_blue_eyes.png" alt="A cute baby sea otter with blue eyes" width="60%" />
+</div>
