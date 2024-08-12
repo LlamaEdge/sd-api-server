@@ -17,6 +17,27 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
     // log
     info!(target: "image_generation_handler", "Handling the coming image generation request");
 
+    if req.method().eq(&hyper::http::Method::OPTIONS) {
+        let result = Response::builder()
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Methods", "*")
+            .header("Access-Control-Allow-Headers", "*")
+            .header("Content-Type", "application/json")
+            .body(Body::empty());
+
+        match result {
+            Ok(response) => return response,
+            Err(e) => {
+                let err_msg = e.to_string();
+
+                // log
+                error!(target: "image_generation_handler", "{}", &err_msg);
+
+                return error::internal_server_error(err_msg);
+            }
+        }
+    }
+
     let res = if req.method() == Method::POST {
         info!(target: "image_generation_handler", "Prepare the image generation request.");
 
@@ -118,6 +139,27 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
 pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
     // log
     info!(target: "image_edit_handler", "Handling the coming image generation request");
+
+    if req.method().eq(&hyper::http::Method::OPTIONS) {
+        let result = Response::builder()
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Methods", "*")
+            .header("Access-Control-Allow-Headers", "*")
+            .header("Content-Type", "application/json")
+            .body(Body::empty());
+
+        match result {
+            Ok(response) => return response,
+            Err(e) => {
+                let err_msg = e.to_string();
+
+                // log
+                error!(target: "image_edit_handler", "{}", &err_msg);
+
+                return error::internal_server_error(err_msg);
+            }
+        }
+    }
 
     let res = match *req.method() {
         Method::POST => {
@@ -564,6 +606,27 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
 pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body> {
     // log
     info!(target: "image_variation_handler", "Handling the coming image variation request");
+
+    if req.method().eq(&hyper::http::Method::OPTIONS) {
+        let result = Response::builder()
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Methods", "*")
+            .header("Access-Control-Allow-Headers", "*")
+            .header("Content-Type", "application/json")
+            .body(Body::empty());
+
+        match result {
+            Ok(response) => return response,
+            Err(e) => {
+                let err_msg = e.to_string();
+
+                // log
+                error!(target: "image_variation_handler", "{}", &err_msg);
+
+                return error::internal_server_error(err_msg);
+            }
+        }
+    }
 
     let res = match *req.method() {
         Method::POST => {
