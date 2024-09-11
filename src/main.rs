@@ -24,7 +24,7 @@ type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 const DEFAULT_SOCKET_ADDRESS: &str = "0.0.0.0:8080";
 
 #[derive(Debug, Parser)]
-#[command(name = "LlamaEdge-RAG API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "LlamaEdge-Stable-Diffusion API Server")]
+#[command(name = "LlamaEdge-StableDiffusion API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "LlamaEdge-Stable-Diffusion API Server")]
 #[command(group = ArgGroup::new("model_group").multiple(false).required(true).args(&["model", "diffusion_model"]))]
 struct Cli {
     /// Sets the model name.
