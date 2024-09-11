@@ -73,19 +73,13 @@ jobs:
           cargo +nightly fmt --all -- --check
           cargo +nightly clippy --target wasm32-wasip1 -- -D warnings
 
-    #   - name: Build api-server for linux
-    #     id: build_api_server_linux
-    #     if: startsWith(matrix.os, 'ubuntu')
-    #     env:
-    #       RUSTFLAGS: "--cfg wasmedge --cfg tokio_unstable"
-    #     run: |
-    #       cargo build --target wasm32-wasip1 --release
-
       - name: Build api-server for linux
         id: build_api_server_linux
         if: startsWith(matrix.os, 'ubuntu')
+        env:
+          RUSTFLAGS: "--cfg wasmedge --cfg tokio_unstable"
         run: |
-          cargo build --release
+          cargo build --target wasm32-wasip1 --release
 
       - name: Build api-server for macos
         id: build_api_server_macos
