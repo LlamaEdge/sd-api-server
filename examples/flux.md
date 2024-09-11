@@ -52,7 +52,7 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
     --model-name flux1-schnell \
     --diffusion-model flux1-schnell-Q8_0.gguf \
     --vae ae.safetensors \
-    -clip-l clip_l.safetensors \
+    --clip-l clip_l.safetensors \
     --t5xxl t5xxl_fp16.safetensors
   ```
 
