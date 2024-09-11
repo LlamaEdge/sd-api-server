@@ -6,7 +6,7 @@ mod error;
 mod utils;
 
 use anyhow::Result;
-use clap::Parser;
+use clap::{ArgGroup, Parser};
 use error::ServerError;
 use hyper::{
     body::HttpBody,
@@ -25,13 +25,29 @@ const DEFAULT_SOCKET_ADDRESS: &str = "0.0.0.0:8080";
 
 #[derive(Debug, Parser)]
 #[command(name = "LlamaEdge-RAG API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "LlamaEdge-Stable-Diffusion API Server")]
+#[command(group = ArgGroup::new("model_group").multiple(false).required(true).args(&["model", "diffusion_model"]))]
 struct Cli {
     /// Sets the model name.
     #[arg(short, long, required = true)]
     model_name: String,
-    /// Sets the gguf model file with the '.gguf' extension.
-    #[arg(short, long, required = true)]
-    gguf: String,
+    /// Path to full model
+    #[arg(short, long, default_value = "", group = "model_group")]
+    model: String,
+    /// Path to the standalone diffusion model file.
+    #[arg(long, default_value = "", group = "model_group")]
+    diffusion_model: String,
+    /// Path to vae
+    #[arg(long, default_value = "")]
+    vae: String,
+    /// Path to the clip-l text encoder
+    #[arg(long, default_value = "")]
+    clip_l: String,
+    /// Path to the the t5xxl text encoder
+    #[arg(long, default_value = "")]
+    t5xxl: String,
+    /// Number of threads to use during computation
+    #[arg(long, default_value = "1")]
+    threads: i32,
     /// Socket address of LlamaEdge API Server instance
     #[arg(long, default_value = DEFAULT_SOCKET_ADDRESS)]
     socket_addr: String,
@@ -63,18 +79,34 @@ async fn main() -> Result<(), ServerError> {
     // log model name
     info!(target: "stdout", "model_name: {}", cli.model_name);
 
-    if !cli.gguf.ends_with(".gguf") {
+    // Determine which model option is set
+    if !cli.model.is_empty() {
+        info!(target: "stdout", "model: {}", &cli.model);
+
+        // initialize the stable diffusion context
+        llama_core::init_stable_diffusion_context_with_full_model(&cli.model)
+            .map_err(|e| ServerError::Operation(format!("{}", e)))?;
+    } else if !cli.diffusion_model.is_empty() {
+        info!(target: "stdout", "diffusion model: {}", &cli.diffusion_model);
+        info!(target: "stdout", "vae: {}", &cli.vae);
+        info!(target: "stdout", "clip_l: {}", &cli.clip_l);
+        info!(target: "stdout", "t5xxl: {}", &cli.t5xxl);
+        info!(target: "stdout", "threads: {}", cli.threads);
+
+        // initialize the stable diffusion context
+        llama_core::init_stable_diffusion_context_with_standalone_diffusion_model(
+            &cli.diffusion_model,
+            &cli.vae,
+            &cli.clip_l,
+            &cli.t5xxl,
+            cli.threads,
+        )
+        .map_err(|e| ServerError::Operation(format!("{}", e)))?;
+    } else {
         return Err(ServerError::ArgumentError(
-            "The value of the '--gguf' option should be a gguf file with the '.gguf' extension."
-                .into(),
+            "The '--model' or '--diffusion-model' option should be specified.".into(),
         ));
     }
-    // log gguf filename
-    info!(target: "stdout", "gguf: {}", cli.gguf);
-
-    // initialize the stable diffusion context
-    llama_core::init_stable_diffusion_context(&cli.gguf)
-        .map_err(|e| ServerError::Operation(format!("{}", e)))?;
 
     // socket address
     let addr = cli
@@ -87,7 +119,7 @@ async fn main() -> Result<(), ServerError> {
 
     let new_service = make_service_fn(move |conn: &AddrStream| {
         // log socket address
-        info!(target: "connection", "remote_addr: {}, local_addr: {}", conn.remote_addr().to_string(), conn.local_addr().to_string());
+        info!(target: "stdout", "remote_addr: {}, local_addr: {}", conn.remote_addr().to_string(), conn.local_addr().to_string());
 
         async move { Ok::<_, Error>(service_fn(move |req| handle_request(req))) }
     });
