@@ -1,5 +1,7 @@
 # FLUX.1
 
+This example demonstrates how to use the `sd-api-server` to generate images using the FLUX.1-Schnell model.
+
 ## Setup
 
 - Install WasmEdge v0.14.1
