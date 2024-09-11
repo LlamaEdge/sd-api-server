@@ -45,6 +45,12 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
   curl -LO https://huggingface.co/second-state/FLUX.1-schnell-GGUF/resolve/main/t5xxl_fp16.safetensors
   ```
 
+- Download `sd-api-server.wasm`
+
+  ```bash
+  curl -LO https://github.com/LlamaEdge/sd-api-server/releases/download/0.1.0/sd-api-server.wasm
+  ```
+
 - Start the server
 
   ```bash
