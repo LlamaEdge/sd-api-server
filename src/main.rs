@@ -121,7 +121,7 @@ async fn main() -> Result<(), ServerError> {
         // log socket address
         info!(target: "stdout", "remote_addr: {}, local_addr: {}", conn.remote_addr().to_string(), conn.local_addr().to_string());
 
-        async move { Ok::<_, Error>(service_fn(move |req| handle_request(req))) }
+        async move { Ok::<_, Error>(service_fn(handle_request)) }
     });
 
     let tcp_listener = TcpListener::bind(addr).await.unwrap();

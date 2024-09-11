@@ -74,7 +74,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
         // log user id
         info!(target: "stdout", "user: {}", image_request.user.clone().unwrap());
 
-        let res = match llama_core::images::image_generation(&mut image_request).await {
+        match llama_core::images::image_generation(&mut image_request).await {
             Ok(images_response) => {
                 // serialize embedding object
                 match serde_json::to_string(&images_response) {
@@ -118,9 +118,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
 
                 error::internal_server_error(err_msg)
             }
-        };
-
-        res
+        }
     } else {
         let err_msg = "Invalid HTTP Method.";
 
@@ -594,7 +592,7 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                 }
             }
         }
-        _ => error::method_not_allowed(req.method().to_string()),
+        _ => error::method_not_allowed(req.method()),
     };
 
     // log
@@ -954,7 +952,7 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
                 }
             }
         }
-        _ => error::method_not_allowed(req.method().to_string()),
+        _ => error::method_not_allowed(req.method()),
     };
 
     // log
