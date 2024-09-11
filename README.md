@@ -53,7 +53,7 @@ cp target/wasm32-wasip1/release/sd-api-server.wasm .
 - Start the server
 
   ```bash
-  wasmedge --dir .:. sd-api-server.wasm --model-name sd-v1.4 --gguf stable-diffusion-v1-4-Q8_0.gguf
+  wasmedge --dir .:. sd-api-server.wasm --model-name sd-v1.4 --model stable-diffusion-v1-4-Q8_0.gguf
   ```
 
   > `sd-api-server` will use `8080` port by default. You can change the port by adding `--socket-addr <ip-address>:<port>`.
