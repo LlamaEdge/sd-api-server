@@ -2,41 +2,32 @@
 
 This project is a RESTful API server that provides image generation and editing services based on Stable Diffusion models. The APIs are compatible with OpenAI APIs of [image generation and editing](https://platform.openai.com/docs/api-reference/images).
 
-## Setup
+## Quick Start
+
+### Setup
 
 - Install WasmEdge v0.14.1-rc.1
 
   ```bash
-  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1-rc.1 --nowasilogging
+  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1-rc.4
   ```
 
-- Install `wasmedge_stablediffusion` and `wasmedge_logging` plugins
+- Deply `wasmedge_stablediffusion` plugin
+
+  > For the purpose of demonstration, we will use the stable diffusion plugin for Mac Apple Silicon. You can find the plugin for other platforms [Releases/0.14.1-rc.4](https://github.com/WasmEdge/WasmEdge/releases/tag/0.14.1-rc.4)
 
   ```bash
   # Download stable diffusion plugin for Mac Apple Silicon
-  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.1/WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.1-darwin_arm64.tar.gz
+  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.4/WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.4-darwin_arm64.tar.gz
 
   # Unzip the plugin to $HOME/.wasmedge/plugin
-  tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.1-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
+  tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.4-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
 
-  # Download logging plugin for Mac Apple Silicon
-  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-beta.2/WasmEdge-plugin-wasi_logging-0.14.1-beta.2-darwin_arm64.tar.gz
-
-  # Unzip the plugin to $HOME/.wasmedge/plugin
-  tar -xzf WasmEdge-plugin-wasi_logging-0.14.1-beta.2-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
+  # remove wasi_nn-ggml plugin if exists
+  rm $HOME/.wasmedge/plugin/libwasmedgePluginWasiNN.dylib
   ```
 
-## Build
-
-```bash
-cargo build --target wasm32-wasip1 --release
-
-cp target/wasm32-wasip1/release/sd-api-server.wasm .
-```
-
-`sd-api-server.wasm` will be generated in `target/wasm32-wasip1/release/`.
-
-## Run
+### Run sd-api-server
 
 - Download the stable diffusion model
 
@@ -50,6 +41,12 @@ cp target/wasm32-wasip1/release/sd-api-server.wasm .
   - [second-state/stable-diffusion-v1-5-GGUF](https://huggingface.co/second-state/stable-diffusion-v1-5-GGUF)
   - [second-state/stable-diffusion-2-1-GGUF](https://huggingface.co/second-state/stable-diffusion-2-1-GGUF)
 
+- Download sd-api-server.wasm
+
+  ```bash
+  curl -LO https://github.com/LlamaEdge/sd-api-server/releases/download/0.1.0/sd-api-server.wasm
+  ```
+
 - Start the server
 
   ```bash
@@ -58,9 +55,9 @@ cp target/wasm32-wasip1/release/sd-api-server.wasm .
 
   > `sd-api-server` will use `8080` port by default. You can change the port by adding `--socket-addr <ip-address>:<port>`.
 
-## Usage
+### Usage
 
-### Image Generation
+#### Image Generation
 
 - Send a request for image generation
 
@@ -93,7 +90,7 @@ cp target/wasm32-wasip1/release/sd-api-server.wasm .
 <img src="image/otter.png" alt="A cute baby sea otter" width="60%" />
 </div>
 
-### Image Editing
+#### Image Editing
 
 - Send a request for image editing
 
@@ -122,3 +119,11 @@ cp target/wasm32-wasip1/release/sd-api-server.wasm .
 <div align=center>
 <img src="image/otter_blue_eyes.png" alt="A cute baby sea otter with blue eyes" width="60%" />
 </div>
+
+## Build
+
+```bash
+cargo build --target wasm32-wasip1 --release
+```
+
+`sd-api-server.wasm` will be generated in `target/wasm32-wasip1/release/`.
