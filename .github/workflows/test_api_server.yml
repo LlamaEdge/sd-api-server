@@ -17,6 +17,7 @@ on:
       - '**/*.rs'
       - '**/*.sh'
       - '**/.cargo/config.toml'
+      - "tests/*.hurl"
   pull_request:
     branches:
       - dev
@@ -27,6 +28,7 @@ on:
       - '**/Cargo.toml'
       - '**/*.rs'
       - '**/*.sh'
+      - 'tests/*.hurl'
 
 jobs:
   test-api-server:
@@ -51,27 +53,22 @@ jobs:
         with:
           target: wasm32-wasip1
 
-      - name: Install WasmEdge and wasmedge_stablediffusion
+      - name: Install WasmEdge
         run: |
           curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v ${{ matrix.wasmedge_version }}
           ls -al $HOME/.wasmedge/plugin
-
 
       - name: Deploy wasmedge_stablediffusion plugin
         run: |
           curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.4/WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.4-ubuntu20.04_x86_64.tar.gz
           tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.4-ubuntu20.04_x86_64.tar.gz -C $HOME/.wasmedge/plugin
-          ls -al $HOME/.wasmedge/plugin
           rm $HOME/.wasmedge/plugin/libwasmedgePluginWasiNN.so
+          ls -al $HOME/.wasmedge/plugin
 
       - name: Install Hurl
         run: |
           curl --location --remote-name https://github.com/Orange-OpenSource/hurl/releases/download/5.0.1/hurl_5.0.1_amd64.deb
           sudo apt update && sudo apt install ./hurl_5.0.1_amd64.deb
-
-      - name: Download model
-        run: |
-          curl -LO https://huggingface.co/second-state/stable-diffusion-v-1-4-GGUF/resolve/main/stable-diffusion-v1-4-Q8_0.gguf
 
       - name: Build sd-api-server on linux
         env:
@@ -79,6 +76,10 @@ jobs:
         run: |
           cargo build --release
           cp target/wasm32-wasip1/release/sd-api-server.wasm ./sd-api-server.wasm
+
+      - name: Download model
+        run: |
+          curl -LO https://huggingface.co/second-state/stable-diffusion-v-1-4-GGUF/resolve/main/stable-diffusion-v1-4-Q8_0.gguf
 
       - name: Start sd-api-server
         run: |
