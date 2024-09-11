@@ -7,10 +7,14 @@ edition = "2021"
 anyhow = "1.0.80"
 clap = { version = "4.4.6", features = ["cargo", "derive"] }
 endpoints = { version = "=0.13.1", git = "https://github.com/LlamaEdge/LlamaEdge.git", branch = "feat-sd-negative-prompt" }
+# endpoints = { version = "=0.13.1", path = "/Volumes/Dev/secondstate/me/LlamaEdge/crates/endpoints" }
 hyper = { version = "0.14", features = ["full"] }
 llama-core = { version = "=0.16.1", features = [
     "logging",
 ], git = "https://github.com/LlamaEdge/LlamaEdge.git", branch = "feat-sd-negative-prompt" }
+# llama-core = { version = "=0.16.1", features = [
+#     "logging",
+# ], path = "/Volumes/Dev/secondstate/me/LlamaEdge/crates/llama-core" }
 log = { version = "0.4.21", features = ["std", "kv", "kv_serde"] }
 multipart-2021 = "0.19.0"
 serde = { version = "1.0", features = ["derive"] }
