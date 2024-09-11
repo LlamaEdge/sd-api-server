@@ -85,8 +85,8 @@ jobs:
         id: build_api_server_macos
         if: startsWith(matrix.os, 'macos')
         env:
-          WASI_SDK_PATH: /Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0
-          CC: "/Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0/bin/clang --sysroot=/Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0/share/wasi-sysroot"
+          WASI_SDK_PATH: /Users/runner/work/sd-api-server/sd-api-server/wasi-sdk-24.0
+          CC: "/Users/runner/work/sd-api-server/sd-api-server/wasi-sdk-24.0/bin/clang --sysroot=/Users/runner/work/sd-api-server/sd-api-server/wasi-sdk-24.0/share/wasi-sysroot"
           RUSTFLAGS: "--cfg wasmedge --cfg tokio_unstable"
         run: |
           cargo build --target wasm32-wasip1 --release
