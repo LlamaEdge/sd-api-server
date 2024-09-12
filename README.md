@@ -44,7 +44,7 @@ This project is a RESTful API server that provides image generation and editing 
 - Download sd-api-server.wasm
 
   ```bash
-  curl -LO https://github.com/LlamaEdge/sd-api-server/releases/download/0.1.0/sd-api-server.wasm
+  curl -LO https://github.com/LlamaEdge/sd-api-server/releases/latest/download/sd-api-server.wasm
   ```
 
 - Start the server
