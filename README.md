@@ -127,3 +127,35 @@ cargo build --target wasm32-wasip1 --release
 ```
 
 `sd-api-server.wasm` will be generated in `target/wasm32-wasip1/release/`.
+
+## CLI Options
+
+```bash
+$ wasmedge target/wasm32-wasip1/release/sd-api-server.wasm -h
+
+LlamaEdge-Stable-Diffusion API Server
+
+Usage: sd-api-server.wasm [OPTIONS] --model-name <MODEL_NAME> <--model <MODEL>|--diffusion-model <DIFFUSION_MODEL>>
+
+Options:
+  -m, --model-name <MODEL_NAME>
+          Sets the model name
+  -m, --model <MODEL>
+          Path to full model [default: ]
+      --diffusion-model <DIFFUSION_MODEL>
+          Path to the standalone diffusion model file [default: ]
+      --vae <VAE>
+          Path to vae [default: ]
+      --clip-l <CLIP_L>
+          Path to the clip-l text encoder [default: ]
+      --t5xxl <T5XXL>
+          Path to the the t5xxl text encoder [default: ]
+      --threads <THREADS>
+          Number of threads to use during computation [default: 1]
+      --socket-addr <SOCKET_ADDR>
+          Socket address of LlamaEdge API Server instance [default: 0.0.0.0:8080]
+  -h, --help
+          Print help
+  -V, --version
+          Print version
+```
