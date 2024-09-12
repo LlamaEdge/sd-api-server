@@ -6,7 +6,7 @@ This project is a RESTful API server that provides image generation and editing 
 
 ### Setup
 
-- Install WasmEdge v0.14.1-rc.1
+- Install WasmEdge v0.14.1-rc.4
 
   ```bash
   curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1-rc.4
