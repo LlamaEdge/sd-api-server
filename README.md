@@ -9,22 +9,22 @@ This project is a RESTful API server that provides image generation and editing 
 
 ### Setup
 
-- Install WasmEdge v0.14.1-rc.4
+- Install WasmEdge v0.14.1-rc.5
 
   ```bash
-  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1-rc.4
+  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1-rc.5
   ```
 
 - Deply `wasmedge_stablediffusion` plugin
 
-  > For the purpose of demonstration, we will use the stable diffusion plugin for Mac Apple Silicon. You can find the plugin for other platforms [Releases/0.14.1-rc.4](https://github.com/WasmEdge/WasmEdge/releases/tag/0.14.1-rc.4)
+  > For the purpose of demonstration, we will use the stable diffusion plugin for Mac Apple Silicon. You can find the plugin for other platforms [Releases/0.14.1-rc.5](https://github.com/WasmEdge/WasmEdge/releases/tag/0.14.1-rc.5)
 
   ```bash
   # Download stable diffusion plugin for Mac Apple Silicon
-  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.4/WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.4-darwin_arm64.tar.gz
+  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.5/WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.5-darwin_arm64.tar.gz
 
   # Unzip the plugin to $HOME/.wasmedge/plugin
-  tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.4-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
+  tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.5-darwin_arm64.tar.gz.tar.gz -C $HOME/.wasmedge/plugin
 
   # remove wasi_nn-ggml plugin if exists
   rm $HOME/.wasmedge/plugin/libwasmedgePluginWasiNN.dylib
