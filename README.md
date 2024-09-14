@@ -25,9 +25,6 @@ This project is a RESTful API server that provides image generation and editing 
 
   # Unzip the plugin to $HOME/.wasmedge/plugin
   tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.5-darwin_arm64.tar.gz.tar.gz -C $HOME/.wasmedge/plugin
-
-  # remove wasi_nn-ggml plugin if exists
-  rm $HOME/.wasmedge/plugin/libwasmedgePluginWasiNN.dylib
   ```
 
 ### Run sd-api-server
