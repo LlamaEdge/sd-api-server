@@ -22,9 +22,6 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
 
   # Unzip the plugin to $HOME/.wasmedge/plugin
   tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.5-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
-
-  # remove wasi_nn-ggml plugin if exists
-  rm $HOME/.wasmedge/plugin/libwasmedgePluginWasiNN.dylib
   ```
 
 ## Run sd-api-server
