@@ -125,11 +125,27 @@ This project is a RESTful API server that provides image generation and editing 
 
 ## Build
 
-```bash
-cargo build --target wasm32-wasip1 --release
-```
+- For **Linux users**
 
-`sd-api-server.wasm` will be generated in `target/wasm32-wasip1/release/`.
+  ```bash
+  cargo build --release
+  ```
+
+- For **macOS users**
+
+  - Download the `wasi-sdk` from the [official website](https://github.com/WebAssembly/wasi-sdk/releases) and unzip it to the directory you want.
+
+  - Build the project
+
+    ```bash
+    export WASI_SDK_PATH=/path/to/wasi-sdk
+    export CC="${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot"
+    cargo clean
+    cargo update
+    cargo build --release
+    ```
+
+If the build process is successful, `sd-api-server.wasm` will be generated in `target/wasm32-wasip1/release/`.
 
 ## CLI Options
 
