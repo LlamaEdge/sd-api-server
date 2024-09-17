@@ -167,7 +167,7 @@ Options:
       --t5xxl <T5XXL>
           Path to the the t5xxl text encoder [default: ]
       --threads <THREADS>
-          Number of threads to use during computation [default: 1]
+          Number of threads to use during computation. Default is -1, which means to use all available threads [default: -1]
       --socket-addr <SOCKET_ADDR>
           Socket address of LlamaEdge API Server instance [default: 0.0.0.0:8080]
   -h, --help
