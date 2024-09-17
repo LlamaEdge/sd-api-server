@@ -45,8 +45,8 @@ struct Cli {
     /// Path to the the t5xxl text encoder
     #[arg(long, default_value = "")]
     t5xxl: String,
-    /// Number of threads to use during computation
-    #[arg(long, default_value = "1")]
+    /// Number of threads to use during computation. Default is -1, which means to use all available threads.
+    #[arg(long, default_value = "-1")]
     threads: i32,
     /// Socket address of LlamaEdge API Server instance
     #[arg(long, default_value = DEFAULT_SOCKET_ADDRESS)]
