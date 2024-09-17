@@ -1,0 +1,101 @@
+name: Test API Server
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+      - release-*
+      - feat-*
+      - ci-*
+      - refactor-*
+      - fix-*
+      - test-*
+    paths:
+      - '.github/workflows/test_api_server.yml'
+      - '**/Cargo.toml'
+      - '**/*.rs'
+      - '**/*.sh'
+      - '**/.cargo/config.toml'
+      - "tests/*.hurl"
+  pull_request:
+    branches:
+      - dev
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/**'
+      - '**/Cargo.toml'
+      - '**/*.rs'
+      - '**/*.sh'
+      - 'tests/*.hurl'
+
+jobs:
+  test-api-server:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        wasmedge_version: [0.14.1-rc.5]
+    steps:
+      - name: Clone project
+        id: checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust-nightly
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+          target: wasm32-wasip1
+          components: rustfmt, clippy
+
+      - name: Install Rust-stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: wasm32-wasip1
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install libomp5
+
+      - name: Install WasmEdge
+        run: |
+          curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v ${{ matrix.wasmedge_version }}
+          ls -al $HOME/.wasmedge/plugin
+
+      - name: Deploy wasmedge_stablediffusion plugin
+        run: |
+          curl -LO "https://github.com/WasmEdge/WasmEdge/releases/download/${{ matrix.wasmedge_version }}/WasmEdge-plugin-wasmedge_stablediffusion-${{ matrix.wasmedge_version }}-ubuntu20.04_x86_64.tar.gz"
+          tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-${{ matrix.wasmedge_version }}-ubuntu20.04_x86_64.tar.gz -C $HOME/.wasmedge/plugin
+          rm $HOME/.wasmedge/plugin/libwasmedgePluginWasiNN.so
+          ls -al $HOME/.wasmedge/plugin
+
+      - name: Install Hurl
+        run: |
+          curl --location --remote-name https://github.com/Orange-OpenSource/hurl/releases/download/5.0.1/hurl_5.0.1_amd64.deb
+          sudo apt update && sudo apt install ./hurl_5.0.1_amd64.deb
+
+      - name: Build sd-api-server on linux
+        env:
+          RUSTFLAGS: "--cfg wasmedge --cfg tokio_unstable"
+        run: |
+          cargo build --release
+          cp target/wasm32-wasip1/release/sd-api-server.wasm ./sd-api-server.wasm
+
+      - name: Download model
+        run: |
+          curl -LO https://huggingface.co/second-state/stable-diffusion-v-1-4-GGUF/resolve/main/stable-diffusion-v1-4-Q8_0.gguf
+
+      - name: Start sd-api-server
+        run: |
+          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. sd-api-server.wasm --model-name sd-v1.4 --model stable-diffusion-v1-4-Q8_0.gguf --socket-addr 0.0.0.0:8080 > ./start-llamaedge.log 2>&1 &
+          sleep 10
+          cat start-llamaedge.log
+
+      - name: Run test
+        run: |
+          hurl --test --jobs 1 ./tests/sd_1.4.hurl
+
+      - name: Stop llama-api-server
+        run: |
+          pkill -f wasmedge
