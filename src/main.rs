@@ -14,7 +14,7 @@ use hyper::{
     service::{make_service_fn, service_fn},
     Body, Request, Response, Server,
 };
-use std::path::PathBuf;
+use std::{net::SocketAddr, path::PathBuf};
 use tokio::net::TcpListener;
 use utils::LogLevel;
 
@@ -26,6 +26,7 @@ const DEFAULT_PORT: &str = "8080";
 #[derive(Debug, Parser)]
 #[command(name = "LlamaEdge-StableDiffusion API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "LlamaEdge-Stable-Diffusion API Server")]
 #[command(group = ArgGroup::new("model_group").multiple(false).required(true).args(&["model", "diffusion_model"]))]
+#[command(group = ArgGroup::new("socket_address_group").multiple(false).args(&["socket_addr", "port"]))]
 struct Cli {
     /// Sets the model name.
     #[arg(short, long, required = true)]
@@ -48,8 +49,11 @@ struct Cli {
     /// Number of threads to use during computation. Default is -1, which means to use all available threads.
     #[arg(long, default_value = "-1")]
     threads: i32,
+    /// Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`.
+    #[arg(long, default_value = None, value_parser = clap::value_parser!(SocketAddr), group = "socket_address_group")]
+    socket_addr: Option<SocketAddr>,
     /// Port number
-    #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16))]
+    #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16), group = "socket_address_group")]
     port: u16,
 }
 
@@ -108,7 +112,11 @@ async fn main() -> Result<(), ServerError> {
         ));
     }
 
-    let addr = format!("127.0.0.1:{}", cli.port);
+    // socket address
+    let addr = match cli.socket_addr {
+        Some(addr) => addr,
+        None => SocketAddr::from(([0, 0, 0, 0], cli.port)),
+    };
 
     let new_service = make_service_fn(move |conn: &AddrStream| {
         // log socket address
@@ -117,7 +125,7 @@ async fn main() -> Result<(), ServerError> {
         async move { Ok::<_, Error>(service_fn(handle_request)) }
     });
 
-    let tcp_listener = TcpListener::bind(&addr).await.unwrap();
+    let tcp_listener = TcpListener::bind(addr).await.unwrap();
     info!(target: "stdout", "Listening on {}", addr);
 
     let server = Server::from_tcp(tcp_listener.into_std().unwrap())
