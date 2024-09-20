@@ -20,9 +20,6 @@ use utils::LogLevel;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
-// default socket address
-const DEFAULT_SOCKET_ADDRESS: &str = "0.0.0.0:8080";
-
 // default port of LlamaEdge Gateway
 const DEFAULT_PORT: &str = "8080";
 
@@ -51,9 +48,6 @@ struct Cli {
     /// Number of threads to use during computation. Default is -1, which means to use all available threads.
     #[arg(long, default_value = "-1")]
     threads: i32,
-    /// Socket address of LlamaEdge API Server instance
-    #[arg(long, default_value = DEFAULT_SOCKET_ADDRESS)]
-    socket_addr: String,
     /// Socket address of LlamaEdge API Server instance
     #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16))]
     port: u16,
