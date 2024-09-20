@@ -20,7 +20,7 @@ use utils::LogLevel;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
-// default port of LlamaEdge Gateway
+// default port
 const DEFAULT_PORT: &str = "8080";
 
 #[derive(Debug, Parser)]
@@ -48,7 +48,7 @@ struct Cli {
     /// Number of threads to use during computation. Default is -1, which means to use all available threads.
     #[arg(long, default_value = "-1")]
     threads: i32,
-    /// Socket address of LlamaEdge API Server instance
+    /// Port number
     #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16))]
     port: u16,
 }
@@ -109,15 +109,6 @@ async fn main() -> Result<(), ServerError> {
     }
 
     let addr = format!("127.0.0.1:{}", cli.port);
-
-    // // socket address
-    // let addr = cli
-    //     .socket_addr
-    //     .parse::<SocketAddr>()
-    //     .map_err(|e| ServerError::SocketAddr(e.to_string()))?;
-
-    // // log socket address
-    // info!(target: "stdout", "socket_address: {}", &addr);
 
     let new_service = make_service_fn(move |conn: &AddrStream| {
         // log socket address
