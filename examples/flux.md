@@ -7,21 +7,21 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
 - Install WasmEdge v0.14.1
 
   ```bash
-  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1-rc.5
+  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1
   ```
 
   If the installation is successful, WasmEdge will be installed in `$HOME/.wasmedge`.
 
 - Deply `wasmedge_stablediffusion` plugin
 
-  > For the purpose of demonstration, we will use the stable diffusion plugin for Mac Apple Silicon. You can find the plugin for other platforms [Releases/0.14.1-rc.5](https://github.com/WasmEdge/WasmEdge/releases/tag/0.14.1-rc.5)
+  > For the purpose of demonstration, we will use the stable diffusion plugin for Mac Apple Silicon. You can find the plugin for other platforms [Releases/0.14.1](https://github.com/WasmEdge/WasmEdge/releases/tag/0.14.1)
 
   ```bash
   # Download stable diffusion plugin for Mac Apple Silicon
-  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.5/WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.5-darwin_arm64.tar.gz
+  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1/WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-darwin_arm64.tar.gz
 
   # Unzip the plugin to $HOME/.wasmedge/plugin
-  tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-rc.5-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
+  tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
   ```
 
 ## Run sd-api-server
@@ -59,7 +59,7 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
     --t5xxl t5xxl-Q2_K.gguf
   ```
 
-  > `sd-api-server` will use `8080` port by default. You can change the port by adding `--socket-addr <ip-address>:<port>`.
+  > `sd-api-server` will use `8080` port by default. You can change the port by adding `--port <port>`.
 
 ## Usage
 

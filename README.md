@@ -53,7 +53,7 @@ This project is a RESTful API server that provides image generation and editing 
   wasmedge --dir .:. sd-api-server.wasm --model-name sd-v1.4 --model stable-diffusion-v1-4-Q8_0.gguf
   ```
 
-  > `sd-api-server` will use `8080` port by default. You can change the port by adding `--socket-addr <ip-address>:<port>`.
+  > `sd-api-server` will use `8080` port by default. You can change the port by adding `--port <port>`.
 
 ### Usage
 
@@ -95,7 +95,7 @@ This project is a RESTful API server that provides image generation and editing 
 - Send a request for image editing
 
   ```bash
-  curl --location 'http://localhost:10086/v1/images/edits' \
+  curl --location 'http://localhost:8080/v1/images/edits' \
     --form 'image=@"otter.png"' \
     --form 'prompt="A cute baby sea otter with blue eyes"'
   ```
@@ -170,6 +170,8 @@ Options:
           Number of threads to use during computation. Default is -1, which means to use all available threads [default: -1]
       --socket-addr <SOCKET_ADDR>
           Socket address of LlamaEdge API Server instance [default: 0.0.0.0:8080]
+      --port <PORT>
+          Socket address of LlamaEdge API Server instance [default: 8080]
   -h, --help
           Print help
   -V, --version
