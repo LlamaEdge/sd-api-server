@@ -169,7 +169,7 @@ Options:
       --threads <THREADS>
           Number of threads to use during computation. Default is -1, which means to use all available threads [default: -1]
       --port <PORT>
-          Socket address of LlamaEdge API Server instance [default: 8080]
+          Port number [default: 8080]
   -h, --help
           Print help
   -V, --version
