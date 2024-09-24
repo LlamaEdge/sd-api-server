@@ -40,6 +40,7 @@ This project is a RESTful API server that provides image generation and editing 
   - [second-state/stable-diffusion-v-1-4-GGUF](https://huggingface.co/second-state/stable-diffusion-v-1-4-GGUF)
   - [second-state/stable-diffusion-v1-5-GGUF](https://huggingface.co/second-state/stable-diffusion-v1-5-GGUF)
   - [second-state/stable-diffusion-2-1-GGUF](https://huggingface.co/second-state/stable-diffusion-2-1-GGUF)
+  - [second-state/stable-diffusion-3-medium-GGUF](https://huggingface.co/second-state/stable-diffusion-3-medium-GGUF)
 
 - Download sd-api-server.wasm
 
