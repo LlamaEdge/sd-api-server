@@ -2,6 +2,9 @@
 
 This example demonstrates how to use the `sd-api-server` to generate images using the FLUX.1-Schnell model.
 
+> [!TIP]
+> If interested in FLUX.1-dev, you can find the gguf models at [second-state/FLUX.1-dev-GGUF](https://huggingface.co/second-state/FLUX.1-dev-GGUF).
+
 ## Setup
 
 - Install WasmEdge v0.14.1
