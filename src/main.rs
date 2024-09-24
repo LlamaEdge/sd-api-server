@@ -46,6 +46,9 @@ struct Cli {
     /// Path to the the t5xxl text encoder
     #[arg(long, default_value = "")]
     t5xxl: String,
+    /// Path to the lora model directory
+    #[arg(long, default_value = "")]
+    lora_model_dir: String,
     /// Number of threads to use during computation. Default is -1, which means to use all available threads.
     #[arg(long, default_value = "-1")]
     threads: i32,
@@ -88,21 +91,65 @@ async fn main() -> Result<(), ServerError> {
         info!(target: "stdout", "model: {}", &cli.model);
 
         // initialize the stable diffusion context
-        llama_core::init_stable_diffusion_context_with_full_model(&cli.model)
+        llama_core::init_sd_context_with_full_model(&cli.model)
             .map_err(|e| ServerError::Operation(format!("{}", e)))?;
     } else if !cli.diffusion_model.is_empty() {
+        // if diffusion_model is not empty, check if diffusion_model is a valid path
+        if !PathBuf::from(&cli.diffusion_model).exists() {
+            return Err(ServerError::ArgumentError(
+                "The path to the diffusion model does not exist.".into(),
+            ));
+        }
         info!(target: "stdout", "diffusion model: {}", &cli.diffusion_model);
+
+        // if vae is not empty, check if vae is a valid path
+        if !cli.vae.is_empty() {
+            if !PathBuf::from(&cli.vae).exists() {
+                return Err(ServerError::ArgumentError(
+                    "The path to the vae does not exist.".into(),
+                ));
+            }
+        }
         info!(target: "stdout", "vae: {}", &cli.vae);
+
+        // if clip_l is not empty, check if clip_l is a valid path
+        if !cli.clip_l.is_empty() {
+            if !PathBuf::from(&cli.clip_l).exists() {
+                return Err(ServerError::ArgumentError(
+                    "The path to the clip-l text encoder does not exist.".into(),
+                ));
+            }
+        }
         info!(target: "stdout", "clip_l: {}", &cli.clip_l);
+
+        // if t5xxl is not empty, check if t5xxl is a valid path
+        if !cli.t5xxl.is_empty() {
+            if !PathBuf::from(&cli.t5xxl).exists() {
+                return Err(ServerError::ArgumentError(
+                    "The path to the t5xxl text encoder does not exist.".into(),
+                ));
+            }
+        }
         info!(target: "stdout", "t5xxl: {}", &cli.t5xxl);
+
+        // if lora_model_dir is not empty, check if lora_model_dir is a valid path
+        if !cli.lora_model_dir.is_empty() {
+            if !PathBuf::from(&cli.lora_model_dir).exists() {
+                return Err(ServerError::ArgumentError(
+                    "The path to the lora model directory does not exist.".into(),
+                ));
+            }
+        }
+        info!(target: "stdout", "lora_model_dir: {}", &cli.lora_model_dir);
         info!(target: "stdout", "threads: {}", cli.threads);
 
         // initialize the stable diffusion context
-        llama_core::init_stable_diffusion_context_with_standalone_diffusion_model(
+        llama_core::init_sd_context_with_standalone_model(
             &cli.diffusion_model,
             &cli.vae,
             &cli.clip_l,
             &cli.t5xxl,
+            &cli.lora_model_dir,
             cli.threads,
         )
         .map_err(|e| ServerError::Operation(format!("{}", e)))?;
