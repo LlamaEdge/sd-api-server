@@ -103,42 +103,34 @@ async fn main() -> Result<(), ServerError> {
         info!(target: "stdout", "diffusion model: {}", &cli.diffusion_model);
 
         // if vae is not empty, check if vae is a valid path
-        if !cli.vae.is_empty() {
-            if !PathBuf::from(&cli.vae).exists() {
-                return Err(ServerError::ArgumentError(
-                    "The path to the vae does not exist.".into(),
-                ));
-            }
+        if !cli.vae.is_empty() && !PathBuf::from(&cli.vae).exists() {
+            return Err(ServerError::ArgumentError(
+                "The path to the vae does not exist.".into(),
+            ));
         }
         info!(target: "stdout", "vae: {}", &cli.vae);
 
         // if clip_l is not empty, check if clip_l is a valid path
-        if !cli.clip_l.is_empty() {
-            if !PathBuf::from(&cli.clip_l).exists() {
-                return Err(ServerError::ArgumentError(
-                    "The path to the clip-l text encoder does not exist.".into(),
-                ));
-            }
+        if !cli.clip_l.is_empty() && !PathBuf::from(&cli.clip_l).exists() {
+            return Err(ServerError::ArgumentError(
+                "The path to the clip-l text encoder does not exist.".into(),
+            ));
         }
         info!(target: "stdout", "clip_l: {}", &cli.clip_l);
 
         // if t5xxl is not empty, check if t5xxl is a valid path
-        if !cli.t5xxl.is_empty() {
-            if !PathBuf::from(&cli.t5xxl).exists() {
-                return Err(ServerError::ArgumentError(
-                    "The path to the t5xxl text encoder does not exist.".into(),
-                ));
-            }
+        if !cli.t5xxl.is_empty() && !PathBuf::from(&cli.t5xxl).exists() {
+            return Err(ServerError::ArgumentError(
+                "The path to the t5xxl text encoder does not exist.".into(),
+            ));
         }
         info!(target: "stdout", "t5xxl: {}", &cli.t5xxl);
 
         // if lora_model_dir is not empty, check if lora_model_dir is a valid path
-        if !cli.lora_model_dir.is_empty() {
-            if !PathBuf::from(&cli.lora_model_dir).exists() {
-                return Err(ServerError::ArgumentError(
-                    "The path to the lora model directory does not exist.".into(),
-                ));
-            }
+        if !cli.lora_model_dir.is_empty() && !PathBuf::from(&cli.lora_model_dir).exists() {
+            return Err(ServerError::ArgumentError(
+                "The path to the lora model directory does not exist.".into(),
+            ));
         }
         info!(target: "stdout", "lora_model_dir: {}", &cli.lora_model_dir);
         info!(target: "stdout", "threads: {}", cli.threads);
