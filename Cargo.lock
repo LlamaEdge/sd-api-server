@@ -350,8 +350,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "chat-prompts"
 version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85407a927d2273a1ce8eda37ce05d9f0ad19715e382dbc24e215826f61c1ec5e"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-lora-model#449d8160b9857cca18b3b83e8f1f29c3cc3f7f67"
 dependencies = [
  "base64 0.22.1",
  "clap",
@@ -539,8 +538,7 @@ dependencies = [
 [[package]]
 name = "endpoints"
 version = "0.14.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6bad32e58e8d63049a889e9d879832c02f3da107ba8902a7e485a206c3720c1d"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-lora-model#449d8160b9857cca18b3b83e8f1f29c3cc3f7f67"
 dependencies = [
  "indexmap",
  "serde",
@@ -1161,8 +1159,7 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 [[package]]
 name = "llama-core"
 version = "0.17.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51284f8ef814ae135536b88eae44a31abe57cf9a0d69308ac89584a65f9d6683"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-lora-model#449d8160b9857cca18b3b83e8f1f29c3cc3f7f67"
 dependencies = [
  "base64 0.22.1",
  "chat-prompts",
@@ -2990,8 +2987,7 @@ dependencies = [
 [[package]]
 name = "wasmedge_stable_diffusion"
 version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8fb1b65c6fd223a48f25348c20c7a26d9b7bcec82ba80ac95bd31c78992edad"
+source = "git+https://github.com/apepkuss/wasmedge-stable-diffusion.git?branch=feat-lora-model#bb5d0cc50155986aeb9f8afbf6736344c510468a"
 dependencies = [
  "thiserror",
 ]
