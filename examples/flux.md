@@ -3,7 +3,7 @@
 This example demonstrates how to use the `sd-api-server` to generate images using the FLUX.1-Schnell model.
 
 > [!TIP]
-> If interested in FLUX.1-dev, you can find the gguf models at [second-state/FLUX.1-dev-GGUF](https://huggingface.co/second-state/FLUX.1-dev-GGUF).
+> The following commands are also applicable to the `flux.1-dev` model. [second-state/FLUX.1-dev-GGUF](https://huggingface.co/second-state/FLUX.1-dev-GGUF) provides the `flux.1-dev` gguf model and other relevant files.
 
 ## Setup
 
@@ -51,7 +51,7 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
   curl -LO https://github.com/LlamaEdge/sd-api-server/releases/latest/download/sd-api-server.wasm
   ```
 
-- Start the server
+- Start server
 
   ```bash
   wasmedge --dir .:. sd-api-server.wasm \
@@ -63,6 +63,21 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
   ```
 
   > `sd-api-server` will use `8080` port by default. You can change the port by adding `--port <port>`.
+
+  **To start server with LoRA model**, you can refer to the following command.
+
+  Assume that the [LoRA models](https://huggingface.co/XLabs-AI/flux-lora-collection/tree/main) are located in the `lora-models` sub-directory of the current directory:
+
+    ```bash
+    wasmedge --dir .:. sd-api-server.wasm \
+      --dir lora-models:lora-models \
+      --model-name flux1-schnell \
+      --diffusion-model flux1-schnell-Q8_0.gguf \
+      --vae ae-f16.gguf \
+      --clip-l clip_l-Q8_0.gguf \
+      --t5xxl t5xxl-Q2_K.gguf \
+      --lora-model-dir lora-models
+    ```
 
 ## Usage
 
@@ -78,9 +93,12 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
         "prompt": "a lovely cat holding a sign says '\''flux.cpp'\''",
         "cfg_scale": 1.0,
         "sample_method": "euler",
-        "steps": 4
+        "steps": 20
     }'
   ```
+
+  > [!NOTE]
+  > The time taken to generate an image depends on the performance of the hardware.
 
   If the request is handled successfully, the server will return a JSON response like the following:
 
