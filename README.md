@@ -24,7 +24,7 @@ This project is a RESTful API server that provides image generation and editing 
   curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1/WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-darwin_arm64.tar.gz
 
   # Unzip the plugin to $HOME/.wasmedge/plugin
-  tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-darwin_arm64.tar.gz.tar.gz -C $HOME/.wasmedge/plugin
+  tar -xzf WasmEdge-plugin-wasmedge_stablediffusion-0.14.1-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
 
   rm $HOME/.wasmedge/plugin/libwasmedgePluginWasiNN.dylib
   ```
