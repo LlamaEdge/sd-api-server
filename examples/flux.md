@@ -92,7 +92,7 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
     --header 'Content-Type: application/json' \
     --data '{
         "model": "flux1-schnell",
-        "prompt": "a lovely cat holding a sign says '\''flux.cpp'\''",
+        "prompt": "a lovely cat",
         "cfg_scale": 1.0,
         "sample_method": "euler",
         "steps": 20
@@ -110,7 +110,7 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
     "data": [
         {
             "url": "/archives/file_07a68d86-85fd-442c-a336-5e0a1212f4f0/output.png",
-            "prompt": "a lovely cat holding a sign says 'flux.cpp'"
+            "prompt": "a lovely cat"
         }
     ]
   }
