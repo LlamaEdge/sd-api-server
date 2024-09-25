@@ -23,7 +23,7 @@ on:
       - main
     types: [opened, synchronize, reopened]
     paths:
-      - ".github/workflows/**"
+      - ".github/workflows/build.yml"
       - "**/Cargo.toml"
       - "**/*.rs"
       - "**/*.sh"
