@@ -66,21 +66,6 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
   > [!TIP]
   > `sd-api-server` will use `8080` port by default. You can change the port by adding `--port <port>`.
 
-  **To start server with LoRA model**, you can refer to the following command.
-
-  Assume that the [LoRA models](https://huggingface.co/XLabs-AI/flux-lora-collection/tree/main) are located in the `lora-models` sub-directory of the current directory:
-
-    ```bash
-    wasmedge --dir .:. sd-api-server.wasm \
-      --dir lora-models:lora-models \
-      --model-name flux1-schnell \
-      --diffusion-model flux1-schnell-Q8_0.gguf \
-      --vae ae-f16.gguf \
-      --clip-l clip_l-Q8_0.gguf \
-      --t5xxl t5xxl-Q2_K.gguf \
-      --lora-model-dir lora-models
-    ```
-
 ## Usage
 
 ### Image Generation
