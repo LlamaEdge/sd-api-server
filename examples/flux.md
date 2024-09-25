@@ -17,6 +17,7 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
 
 - Deply `wasmedge_stablediffusion` plugin
 
+  > [!NOTE]
   > For the purpose of demonstration, we will use the stable diffusion plugin for Mac Apple Silicon. You can find the plugin for other platforms [Releases/0.14.1](https://github.com/WasmEdge/WasmEdge/releases/tag/0.14.1)
 
   ```bash
