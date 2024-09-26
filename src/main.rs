@@ -32,7 +32,7 @@ struct Cli {
     #[arg(short, long, required = true)]
     model_name: String,
     /// Path to full model
-    #[arg(short, long, default_value = "", group = "model_group")]
+    #[arg(long, default_value = "", group = "model_group")]
     model: String,
     /// Path to the standalone diffusion model file.
     #[arg(long, default_value = "", group = "model_group")]
