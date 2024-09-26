@@ -63,8 +63,9 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
   Assume that the LoRA model is located in the `lora-models` sub-directory of the currect directory.
 
   ```bash
-  wasmedge --dir .:. sd-api-server.wasm \
-    --dir lora-models:lora-models
+  wasmedge --dir .:. \
+    --dir lora-models:lora-models \
+    sd-api-server.wasm \
     --model-name flux1-dev \
     --diffusion-model flux1-dev-Q4_0.gguf \
     --vae ae.safetensors \
