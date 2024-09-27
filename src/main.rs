@@ -6,7 +6,7 @@ mod error;
 mod utils;
 
 use anyhow::Result;
-use clap::{ArgGroup, Parser};
+use clap::{ArgGroup, Parser, ValueEnum};
 use error::ServerError;
 use hyper::{
     body::HttpBody,
@@ -52,6 +52,9 @@ struct Cli {
     /// Number of threads to use during computation. Default is -1, which means to use all available threads.
     #[arg(long, default_value = "-1")]
     threads: i32,
+    /// Context to create for the model.
+    #[arg(long, default_value = "full")]
+    context_type: ContextType,
     /// Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`.
     #[arg(long, default_value = None, value_parser = clap::value_parser!(SocketAddr), group = "socket_address_group")]
     socket_addr: Option<SocketAddr>,
@@ -87,13 +90,19 @@ async fn main() -> Result<(), ServerError> {
     // log model name
     info!(target: "stdout", "model_name: {}", cli.model_name);
 
+    // log context type
+    info!(target: "stdout", "context_type: {:?}", cli.context_type);
+
     // Determine which model option is set
     if !cli.model.is_empty() {
         info!(target: "stdout", "model: {}", &cli.model);
 
         // initialize the stable diffusion context
-        llama_core::init_sd_context_with_full_model(&cli.model)
-            .map_err(|e| ServerError::Operation(format!("{}", e)))?;
+        llama_core::init_sd_context_with_full_model(
+            &cli.model,
+            cli.context_type.to_sd_context_type(),
+        )
+        .map_err(|e| ServerError::Operation(format!("{}", e)))?;
     } else if !cli.diffusion_model.is_empty() {
         // if diffusion_model is not empty, check if diffusion_model is a valid path
         if !PathBuf::from(&cli.diffusion_model).exists() {
@@ -144,6 +153,7 @@ async fn main() -> Result<(), ServerError> {
             &cli.t5xxl,
             &cli.lora_model_dir,
             cli.threads,
+            cli.context_type.to_sd_context_type(),
         )
         .map_err(|e| ServerError::Operation(format!("{}", e)))?;
     } else {
@@ -239,4 +249,27 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
     }
 
     Ok(response)
+}
+
+/// The context to use for the model.
+#[derive(Clone, Debug, Copy, PartialEq, Eq, ValueEnum)]
+enum ContextType {
+    /// `text_to_image` context.
+    #[value(name = "text-to-image")]
+    TextToImage,
+    /// `image_to_image` context.
+    #[value(name = "image-to-image")]
+    ImageToText,
+    /// Both `text_to_image` and `image_to_image` contexts.
+    #[value(name = "full")]
+    Full,
+}
+impl ContextType {
+    fn to_sd_context_type(&self) -> llama_core::SDContextType {
+        match self {
+            ContextType::TextToImage => llama_core::SDContextType::TextToImage,
+            ContextType::ImageToText => llama_core::SDContextType::ImageToImage,
+            ContextType::Full => llama_core::SDContextType::Full,
+        }
+    }
 }
