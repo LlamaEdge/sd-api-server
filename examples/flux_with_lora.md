@@ -77,6 +77,23 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
   > [!TIP]
   > `sd-api-server` will use `8080` port by default. You can change the port by adding `--port <port>`.
 
+  - Reduce the memory usage
+
+    In the default setting, the server will create `text-to-image` and `image-to-image` contexts for the model. `text-to-image` context is responsible for image generation tasks, while `image-to-image` context for image edits. If you only need one of them, you can specify the context type by adding `--context-type <context-type>`. For example, if you only need the `text-to-image` context, you can start the server with the following command:
+
+    ```bash
+    wasmedge --dir .:. \
+      --dir lora-models:lora-models \
+      sd-api-server.wasm \
+      --model-name flux1-dev \
+      --diffusion-model flux1-dev-Q4_0.gguf \
+      --vae ae.safetensors \
+      --clip-l clip_l.safetensors \
+      --t5xxl t5xxl-Q8_0.gguf \
+      --lora-model-dir lora-models \
+      --context-type text-to-image
+    ```
+
 ## Usage
 
 ### Image Generation

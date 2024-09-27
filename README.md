@@ -56,7 +56,16 @@ This project is a RESTful API server that provides image generation and editing 
   wasmedge --dir .:. sd-api-server.wasm --model-name sd-v1.4 --model stable-diffusion-v1-4-Q8_0.gguf
   ```
 
+  > [!TIP]
   > `sd-api-server` will use `8080` port by default. You can change the port by adding `--port <port>`.
+
+  - Reduce the memory usage
+
+    In the default setting, the server will create `text-to-image` and `image-to-image` contexts for the model. `text-to-image` context is responsible for image generation tasks, while `image-to-image` context for image edits. If you only need one of them, you can specify the context type by adding `--context-type <context-type>`. For example, if you only need the `text-to-image` context, you can start the server with the following command:
+
+    ```bash
+    wasmedge --dir .:. sd-api-server.wasm --model-name sd-v1.4 --model stable-diffusion-v1-4-Q8_0.gguf --context-type text-to-image
+    ```
 
 ### Usage
 
@@ -147,7 +156,7 @@ This project is a RESTful API server that provides image generation and editing 
 
 If the build process is successful, `sd-api-server.wasm` will be generated in `target/wasm32-wasip1/release/`.
 
-## CLI Options
+### CLI Options
 
 ```bash
 $ wasmedge target/wasm32-wasip1/release/sd-api-server.wasm -h
@@ -159,7 +168,7 @@ Usage: sd-api-server.wasm [OPTIONS] --model-name <MODEL_NAME> <--model <MODEL>|-
 Options:
   -m, --model-name <MODEL_NAME>
           Sets the model name
-  -m, --model <MODEL>
+      --model <MODEL>
           Path to full model [default: ]
       --diffusion-model <DIFFUSION_MODEL>
           Path to the standalone diffusion model file [default: ]
@@ -169,14 +178,18 @@ Options:
           Path to the clip-l text encoder [default: ]
       --t5xxl <T5XXL>
           Path to the the t5xxl text encoder [default: ]
+      --lora-model-dir <LORA_MODEL_DIR>
+          Path to the lora model directory [default: ]
       --threads <THREADS>
           Number of threads to use during computation. Default is -1, which means to use all available threads [default: -1]
+      --context-type <CONTEXT_TYPE>
+          Context to create for the model [default: full] [possible values: text-to-image, image-to-image, full]
       --socket-addr <SOCKET_ADDR>
-          Socket address of LlamaEdge API Server instance
+          Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`
       --port <PORT>
           Port number [default: 8080]
   -h, --help
-          Print help
+          Print help (see more with '--help')
   -V, --version
           Print version
 ```
