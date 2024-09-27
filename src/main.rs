@@ -265,7 +265,7 @@ enum ContextType {
     Full,
 }
 impl ContextType {
-    fn to_sd_context_type(&self) -> llama_core::SDContextType {
+    fn to_sd_context_type(self) -> llama_core::SDContextType {
         match self {
             ContextType::TextToImage => llama_core::SDContextType::TextToImage,
             ContextType::ImageToText => llama_core::SDContextType::ImageToImage,
