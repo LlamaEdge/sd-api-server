@@ -441,31 +441,45 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             return error::internal_server_error(err_msg);
                         }
                     },
-                    "size" => match field.is_text() {
-                        true => {
-                            let mut size = String::new();
+                    "size" => {
+                        match field.is_text() {
+                            true => {
+                                let mut size = String::new();
 
-                            if let Err(e) = field.data.read_to_string(&mut size) {
-                                let err_msg = format!("Failed to read the size. {}", e);
+                                if let Err(e) = field.data.read_to_string(&mut size) {
+                                    let err_msg = format!("Failed to read the size. {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::internal_server_error(err_msg);
+                                }
+
+                                // image_request.size = Some(size);
+
+                                let parts: Vec<&str> = size.split('x').collect();
+                                if parts.len() != 2 {
+                                    let err_msg = "Invalid size format. The correct format is `HeightxWidth`. Example: 256x256";
+
+                                    // log
+                                    error!(target: "stdout", "{}", err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                                image_request.height = Some(parts[0].parse().unwrap());
+                                image_request.width = Some(parts[1].parse().unwrap());
+                            }
+                            false => {
+                                let err_msg =
+                                "Failed to get the size. The size field in the request should be a text field.";
 
                                 // log
                                 error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
-
-                            image_request.size = Some(size);
                         }
-                        false => {
-                            let err_msg =
-                                "Failed to get the size. The size field in the request should be a text field.";
-
-                            // log
-                            error!(target: "stdout", "{}", &err_msg);
-
-                            return error::internal_server_error(err_msg);
-                        }
-                    },
+                    }
                     "response_format" => match field.is_text() {
                         true => {
                             let mut response_format = String::new();
@@ -529,7 +543,300 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             return error::internal_server_error(err_msg);
                         }
                     },
-                    _ => unimplemented!("unknown field"),
+                    "cfg_scale" => match field.is_text() {
+                        true => {
+                            let mut cfg_scale = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut cfg_scale) {
+                                let err_msg = format!("Failed to read the cfg_config. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match cfg_scale.parse::<f32>() {
+                                Ok(scale) => image_request.cfg_scale = Some(scale),
+                                Err(e) => {
+                                    let err_msg = format!(
+                                        "Failed to parse the number of images. Reason: {}",
+                                        e
+                                    );
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the cfg_config. The cfg_config field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "sample_method" => match field.is_text() {
+                        true => {
+                            let mut sample_method = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut sample_method) {
+                                let err_msg = format!("Failed to read the sample_method. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            image_request.sample_method = Some(sample_method.as_str().into());
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the sample_method. The sample_method field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "steps" => match field.is_text() {
+                        true => {
+                            let mut steps = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut steps) {
+                                let err_msg = format!("Failed to read the steps. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match steps.parse::<usize>() {
+                                Ok(steps) => image_request.steps = Some(steps),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse the steps. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the steps. The steps field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "height" => match field.is_text() {
+                        true => {
+                            let mut height = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut height) {
+                                let err_msg = format!("Failed to read the height. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match height.parse::<usize>() {
+                                Ok(height) => image_request.height = Some(height),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse the height. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the height. The height field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "width" => match field.is_text() {
+                        true => {
+                            let mut width = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut width) {
+                                let err_msg = format!("Failed to read the width. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match width.parse::<usize>() {
+                                Ok(width) => image_request.width = Some(width),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse the width. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the width. The width field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "control_strength" => match field.is_text() {
+                        true => {
+                            let mut control_strength = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut control_strength) {
+                                let err_msg = format!("Failed to read the control_strength. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match control_strength.parse::<f32>() {
+                                Ok(control_strength) => {
+                                    image_request.control_strength = Some(control_strength)
+                                }
+                                Err(e) => {
+                                    let err_msg = format!(
+                                        "Failed to parse the control_strength. Reason: {}",
+                                        e
+                                    );
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the control_strength. The control_strength field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "seed" => match field.is_text() {
+                        true => {
+                            let mut seed = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut seed) {
+                                let err_msg = format!("Failed to read the seed. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match seed.parse::<i32>() {
+                                Ok(seed) => image_request.seed = Some(seed),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse the seed. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the seed. The seed field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "strength" => match field.is_text() {
+                        true => {
+                            let mut strength = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut strength) {
+                                let err_msg = format!("Failed to read the strength. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match strength.parse::<f32>() {
+                                Ok(strength) => {
+                                    image_request.strength = Some(strength);
+                                    info!(target: "stdout", "strength: {}", strength);
+                                }
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse the strength. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the strength. The strength field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    unsupported_field => {
+                        let err_msg = format!("Unsupported field: {}", unsupported_field);
+
+                        // log
+                        error!(target: "stdout", "{}", &err_msg);
+
+                        return error::bad_request(err_msg);
+                    }
                 }
             }
 
