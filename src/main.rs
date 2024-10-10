@@ -259,7 +259,7 @@ enum ContextType {
     TextToImage,
     /// `image_to_image` context.
     #[value(name = "image-to-image")]
-    ImageToText,
+    ImageToImage,
     /// Both `text_to_image` and `image_to_image` contexts.
     #[value(name = "full")]
     Full,
@@ -268,7 +268,7 @@ impl ContextType {
     fn to_sd_context_type(self) -> llama_core::SDContextType {
         match self {
             ContextType::TextToImage => llama_core::SDContextType::TextToImage,
-            ContextType::ImageToText => llama_core::SDContextType::ImageToImage,
+            ContextType::ImageToImage => llama_core::SDContextType::ImageToImage,
             ContextType::Full => llama_core::SDContextType::Full,
         }
     }
