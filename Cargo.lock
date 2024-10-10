@@ -350,7 +350,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "chat-prompts"
 version = "0.16.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-image-to-image#cb233bfd8d713de4a8eef37d670b7279b177b8fe"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-image-to-image#aee246a36f4195e0cfe1ab94f3c7fc12fefeb7f0"
 dependencies = [
  "base64 0.22.1",
  "clap",
@@ -538,7 +538,7 @@ dependencies = [
 [[package]]
 name = "endpoints"
 version = "0.15.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-image-to-image#cb233bfd8d713de4a8eef37d670b7279b177b8fe"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-image-to-image#aee246a36f4195e0cfe1ab94f3c7fc12fefeb7f0"
 dependencies = [
  "indexmap",
  "serde",
@@ -1159,8 +1159,8 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 
 [[package]]
 name = "llama-core"
-version = "0.19.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-image-to-image#cb233bfd8d713de4a8eef37d670b7279b177b8fe"
+version = "0.19.2"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-image-to-image#aee246a36f4195e0cfe1ab94f3c7fc12fefeb7f0"
 dependencies = [
  "base64 0.22.1",
  "chat-prompts",
