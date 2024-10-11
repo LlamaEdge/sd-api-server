@@ -296,6 +296,31 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             return error::internal_server_error(err_msg);
                         }
                     },
+                    "negative_prompt" => match field.is_text() {
+                        true => {
+                            let mut negative_prompt = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut negative_prompt) {
+                                let err_msg = format!("Failed to read the prompt. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            image_request.prompt = negative_prompt;
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the prompt. The prompt field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
                     "mask" => {
                         let filename = match field.headers.filename {
                             Some(filename) => filename,
