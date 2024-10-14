@@ -49,6 +49,12 @@ struct Cli {
     /// Path to the lora model directory
     #[arg(long, default_value = "")]
     lora_model_dir: String,
+    /// Path to control net model
+    #[arg(long)]
+    control_net: Option<String>,
+    /// Keep control net model on cpu
+    #[arg(long, default_value = "false")]
+    control_net_cpu: bool,
     /// Number of threads to use during computation. Default is -1, which means to use all available threads.
     #[arg(long, default_value = "-1")]
     threads: i32,
@@ -93,6 +99,22 @@ async fn main() -> Result<(), ServerError> {
     // log context type
     info!(target: "stdout", "context_type: {:?}", cli.context_type);
 
+    // log control net
+    let mut control_net_cpu = false;
+    if let Some(control_net) = &cli.control_net {
+        info!(target: "stdout", "control_net: {}", &control_net);
+
+        if cli.control_net_cpu {
+            info!(target: "stdout", "control_net_cpu: true");
+            control_net_cpu = true;
+        } else {
+            info!(target: "stdout", "control_net_cpu: false");
+        }
+    }
+
+    // log threads
+    info!(target: "stdout", "threads: {}", cli.threads);
+
     // Determine which model option is set
     if !cli.model.is_empty() {
         info!(target: "stdout", "model: {}", &cli.model);
@@ -100,6 +122,9 @@ async fn main() -> Result<(), ServerError> {
         // initialize the stable diffusion context
         llama_core::init_sd_context_with_full_model(
             &cli.model,
+            cli.control_net.as_deref(),
+            control_net_cpu,
+            cli.threads,
             cli.context_type.to_sd_context_type(),
         )
         .map_err(|e| ServerError::Operation(format!("{}", e)))?;
@@ -143,7 +168,6 @@ async fn main() -> Result<(), ServerError> {
             ));
         }
         info!(target: "stdout", "lora_model_dir: {}", &cli.lora_model_dir);
-        info!(target: "stdout", "threads: {}", cli.threads);
 
         // initialize the stable diffusion context
         llama_core::init_sd_context_with_standalone_model(
@@ -152,6 +176,8 @@ async fn main() -> Result<(), ServerError> {
             &cli.clip_l,
             &cli.t5xxl,
             &cli.lora_model_dir,
+            cli.control_net.as_deref(),
+            control_net_cpu,
             cli.threads,
             cli.context_type.to_sd_context_type(),
         )
