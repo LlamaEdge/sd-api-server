@@ -57,7 +57,7 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
 - Download the control image
 
   ```bash
-  curl -LO https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/control_2.png
+  curl -LO https://raw.githubusercontent.com/LlamaEdge/sd-api-server/refs/heads/main/image/control_2.png
   ```
 
 - Send a POST request to the server to generate an image
