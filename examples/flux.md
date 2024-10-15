@@ -79,7 +79,7 @@ This example demonstrates how to use the `sd-api-server` to generate images usin
       --vae ae.safetensors \
       --clip-l clip_l.safetensors \
       --t5xxl t5xxl-Q8_0.gguf \
-      --context-type text-to-image
+      --task text2image
     ```
 
 ## Usage
