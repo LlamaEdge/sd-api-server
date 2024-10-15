@@ -1,6 +1,6 @@
 # ControlNet
 
-This example demonstrates how to use the `sd-api-server` to generate images using the stable diffusion model with the openpose control model.
+This example demonstrates how to use the `sd-api-server` to generate images using [stable-diffusion-v1.4](https://huggingface.co/second-state/stable-diffusion-v-1-4-GGUF) model with the openpose control model.
 
 ## Setup
 
