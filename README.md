@@ -61,10 +61,10 @@ This project is a RESTful API server that provides image generation and editing 
 
   - Reduce the memory usage
 
-    In the default setting, the server will create `text-to-image` and `image-to-image` contexts for the model. `text-to-image` context is responsible for image generation tasks, while `image-to-image` context for image edits. If you only need one of them, you can specify the context type by adding `--context-type <context-type>`. For example, if you only need the `text-to-image` context, you can start the server with the following command:
+    In the default setting, the server support two tasks:  `text2image` for image generations and `image2image` for image edits. If you want to run one of them, you can specify the task type by adding `--task <task-type>`. For example, if you only want to run image generations, then just start the server with the following command:
 
     ```bash
-    wasmedge --dir .:. sd-api-server.wasm --model-name sd-v1.4 --model stable-diffusion-v1-4-Q8_0.gguf --context-type text-to-image
+    wasmedge --dir .:. sd-api-server.wasm --model-name sd-v1.4 --model stable-diffusion-v1-4-Q8_0.gguf --task text2image
     ```
 
 ### Usage
@@ -182,8 +182,8 @@ Options:
           Path to the lora model directory [default: ]
       --threads <THREADS>
           Number of threads to use during computation. Default is -1, which means to use all available threads [default: -1]
-      --context-type <CONTEXT_TYPE>
-          Context to create for the model [default: full] [possible values: text-to-image, image-to-image, full]
+      --task <TASK>
+          Task type [default: full] [possible values: text2image, image2image, full]
       --socket-addr <SOCKET_ADDR>
           Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`
       --port <PORT>
