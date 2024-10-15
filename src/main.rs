@@ -47,8 +47,8 @@ struct Cli {
     #[arg(long, default_value = "")]
     t5xxl: String,
     /// Path to the lora model directory
-    #[arg(long, default_value = "")]
-    lora_model_dir: String,
+    #[arg(long)]
+    lora_model_dir: Option<String>,
     /// Path to control net model
     #[arg(long)]
     control_net: Option<String>,
@@ -99,6 +99,13 @@ async fn main() -> Result<(), ServerError> {
     // log task type
     info!(target: "stdout", "task: {:?}", &cli.task);
 
+    // log lora model directory
+    if let Some(lora_model_dir) = &cli.lora_model_dir {
+        info!(target: "stdout", "lora_model_dir: {}", lora_model_dir);
+    } else {
+        info!(target: "stdout", "lora_model_dir: None");
+    }
+
     // log control net
     let mut control_net_cpu = false;
     if let Some(control_net) = &cli.control_net {
@@ -122,6 +129,7 @@ async fn main() -> Result<(), ServerError> {
         // initialize the stable diffusion context
         llama_core::init_sd_context_with_full_model(
             &cli.model,
+            cli.lora_model_dir.as_deref(),
             cli.control_net.as_deref(),
             control_net_cpu,
             cli.threads,
@@ -161,21 +169,13 @@ async fn main() -> Result<(), ServerError> {
         }
         info!(target: "stdout", "t5xxl: {}", &cli.t5xxl);
 
-        // if lora_model_dir is not empty, check if lora_model_dir is a valid path
-        if !cli.lora_model_dir.is_empty() && !PathBuf::from(&cli.lora_model_dir).exists() {
-            return Err(ServerError::ArgumentError(
-                "The path to the lora model directory does not exist.".into(),
-            ));
-        }
-        info!(target: "stdout", "lora_model_dir: {}", &cli.lora_model_dir);
-
         // initialize the stable diffusion context
         llama_core::init_sd_context_with_standalone_model(
             &cli.diffusion_model,
             &cli.vae,
             &cli.clip_l,
             &cli.t5xxl,
-            &cli.lora_model_dir,
+            cli.lora_model_dir.as_deref(),
             cli.control_net.as_deref(),
             control_net_cpu,
             cli.threads,
