@@ -26,27 +26,43 @@ Creates an image given a prompt.
 - **height** (integer, optional): Height of the generated image in pixel space. Default is 512. If `size` is provided, this field will be ignored.
 - **width** (integer, optional): Width of the generated image in pixel space. Default is 512. If `size` is provided, this field will be ignored.
 - **control_strength** (float, optional): Control strength for the model. Default is 0.9.
+- **control_image** (file, optional): Control image to use for image generation.
 - **seed** (integer, optional): Seed for the random number generator. Negative value means to use random seed. Default is 42.
 - **response_format** (string, optional): Format of the response. Possible values are `url` and `b64_json`. Default is `url`.
 
 ### Example
 
-```bash
-curl -X POST http://localhost:8080/v1/images/generations \
---header 'Content-Type: application/json' \
---data '{
-  "model": "sd",
-  "prompt": "A painting of a beautiful sunset over a calm lake.",
-  "negative_prompt": "No people or animals in the image.",
-  "n": 1,
-  "cfg_scale": 7.0,
-  "sample_method": "euler_a",
-  "steps": 20,
-  "size": "512x512",
-  "control_strength": 0.9,
-  "seed": 42
-}'
-```
+- Text-to-image generation:
+
+  ```bash
+  curl -X POST http://localhost:8080/v1/images/generations \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "model": "sd",
+    "prompt": "A painting of a beautiful sunset over a calm lake.",
+    "negative_prompt": "No people or animals in the image.",
+    "n": 1,
+    "cfg_scale": 7.0,
+    "sample_method": "euler_a",
+    "steps": 20,
+    "size": "512x512",
+    "seed": 42
+  }'
+  ```
+
+- Text-to-image generation with control net:
+
+  ```bash
+  curl --location 'http://localhost:10086/v1/images/generations' \
+  --form 'control_image=@"/path/control_image.png"' \
+  --form 'prompt="a person"' \
+  --form 'cfg_scale="7.0"' \
+  --form 'sample_method="euler_a"' \
+  --form 'steps="20"' \
+  --form 'size="512x512"' \
+  --form 'control_strength="0.9"' \
+  --form 'seed="42"'
+  ```
 
 ## Edit Image
 
@@ -70,6 +86,7 @@ Creates an edited or extended image given an original image and a prompt.
 - **sample_method** (string, optional): Sampling method to use. Possible values are `euler`, `euler_a`, `heun`, `dpm2`, `dpm++2s_a`, `dpm++2m`, `dpm++2mv2`, `ipndm`, `ipndm_v`, and `lcm`. Default is `euler_a`.
 - **steps** (integer, optional): Number of sample steps to take. Default is 20.
 - **control_strength** (float, optional): Control strength for the model. Default is 0.9.
+- **control_image** (file, optional): Control image to use for image generation.
 - **seed** (integer, optional): Seed for the random number generator. Negative value means to use random seed. Default is 42.
 - **strength** (float, optional): Strength of the edit. Default is 0.75.
 - **response_format** (string, optional): Format of the response. Possible values are `url` and `b64_json`. Default is `url`.
