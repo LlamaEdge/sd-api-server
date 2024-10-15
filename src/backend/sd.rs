@@ -89,88 +89,6 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
             let mut image_request = ImageCreateRequest::default();
             while let ReadEntryResult::Entry(mut field) = multipart.read_entry_mut() {
                 match &*field.headers.name {
-                    "control_image" => {
-                        let filename = match field.headers.filename {
-                            Some(filename) => filename,
-                            None => {
-                                let err_msg =
-                                    "Failed to upload the image file. The filename is not provided.";
-
-                                // log
-                                error!(target: "stdout", "{}", &err_msg);
-
-                                return error::internal_server_error(err_msg);
-                            }
-                        };
-
-                        // get the image data
-                        let mut buffer = Vec::new();
-                        let size_in_bytes = match field.data.read_to_end(&mut buffer) {
-                            Ok(size_in_bytes) => size_in_bytes,
-                            Err(e) => {
-                                let err_msg = format!("Failed to read the image file. {}", e);
-
-                                // log
-                                error!(target: "stdout", "{}", &err_msg);
-
-                                return error::internal_server_error(err_msg);
-                            }
-                        };
-
-                        // create a file id for the image file
-                        let id = format!("file_{}", uuid::Uuid::new_v4());
-
-                        // save the file
-                        let path = Path::new("archives");
-                        if !path.exists() {
-                            fs::create_dir(path).unwrap();
-                        }
-                        let file_path = path.join(&id);
-                        if !file_path.exists() {
-                            fs::create_dir(&file_path).unwrap();
-                        }
-                        let mut file = match File::create(file_path.join(&filename)) {
-                            Ok(file) => file,
-                            Err(e) => {
-                                let err_msg = format!(
-                                    "Failed to create archive document {}. {}",
-                                    &filename, e
-                                );
-
-                                // log
-                                error!(target: "stdout", "{}", &err_msg);
-
-                                return error::internal_server_error(err_msg);
-                            }
-                        };
-                        file.write_all(&buffer[..]).unwrap();
-
-                        // log
-                        info!(target: "stdout", "file_id: {}, file_name: {}, size in bytes: {}", &id, &filename, size_in_bytes);
-
-                        let created_at =
-                            match SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
-                                Ok(n) => n.as_secs(),
-                                Err(_) => {
-                                    let err_msg = "Failed to get the current time.";
-
-                                    // log
-                                    error!(target: "stdout", "{}", err_msg);
-
-                                    return error::internal_server_error(err_msg);
-                                }
-                            };
-
-                        // create a file object
-                        image_request.control_image = Some(FileObject {
-                            id,
-                            bytes: size_in_bytes as u64,
-                            created_at,
-                            filename,
-                            object: "file".to_string(),
-                            purpose: "assistants".to_string(),
-                        });
-                    }
                     "prompt" => match field.is_text() {
                         true => {
                             let mut prompt = String::new();
@@ -597,6 +515,88 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                             return error::internal_server_error(err_msg);
                         }
                     },
+                    "control_image" => {
+                        let filename = match field.headers.filename {
+                            Some(filename) => filename,
+                            None => {
+                                let err_msg =
+                                    "Failed to upload the image file. The filename is not provided.";
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+                        };
+
+                        // get the image data
+                        let mut buffer = Vec::new();
+                        let size_in_bytes = match field.data.read_to_end(&mut buffer) {
+                            Ok(size_in_bytes) => size_in_bytes,
+                            Err(e) => {
+                                let err_msg = format!("Failed to read the image file. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+                        };
+
+                        // create a file id for the image file
+                        let id = format!("file_{}", uuid::Uuid::new_v4());
+
+                        // save the file
+                        let path = Path::new("archives");
+                        if !path.exists() {
+                            fs::create_dir(path).unwrap();
+                        }
+                        let file_path = path.join(&id);
+                        if !file_path.exists() {
+                            fs::create_dir(&file_path).unwrap();
+                        }
+                        let mut file = match File::create(file_path.join(&filename)) {
+                            Ok(file) => file,
+                            Err(e) => {
+                                let err_msg = format!(
+                                    "Failed to create archive document {}. {}",
+                                    &filename, e
+                                );
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+                        };
+                        file.write_all(&buffer[..]).unwrap();
+
+                        // log
+                        info!(target: "stdout", "file_id: {}, file_name: {}, size in bytes: {}", &id, &filename, size_in_bytes);
+
+                        let created_at =
+                            match SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
+                                Ok(n) => n.as_secs(),
+                                Err(_) => {
+                                    let err_msg = "Failed to get the current time.";
+
+                                    // log
+                                    error!(target: "stdout", "{}", err_msg);
+
+                                    return error::internal_server_error(err_msg);
+                                }
+                            };
+
+                        // create a file object
+                        image_request.control_image = Some(FileObject {
+                            id,
+                            bytes: size_in_bytes as u64,
+                            created_at,
+                            filename,
+                            object: "file".to_string(),
+                            purpose: "assistants".to_string(),
+                        });
+                    }
                     "seed" => match field.is_text() {
                         true => {
                             let mut seed = String::new();
@@ -1392,6 +1392,88 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             return error::internal_server_error(err_msg);
                         }
                     },
+                    "control_image" => {
+                        let filename = match field.headers.filename {
+                            Some(filename) => filename,
+                            None => {
+                                let err_msg =
+                                    "Failed to upload the image file. The filename is not provided.";
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+                        };
+
+                        // get the image data
+                        let mut buffer = Vec::new();
+                        let size_in_bytes = match field.data.read_to_end(&mut buffer) {
+                            Ok(size_in_bytes) => size_in_bytes,
+                            Err(e) => {
+                                let err_msg = format!("Failed to read the image file. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+                        };
+
+                        // create a file id for the image file
+                        let id = format!("file_{}", uuid::Uuid::new_v4());
+
+                        // save the file
+                        let path = Path::new("archives");
+                        if !path.exists() {
+                            fs::create_dir(path).unwrap();
+                        }
+                        let file_path = path.join(&id);
+                        if !file_path.exists() {
+                            fs::create_dir(&file_path).unwrap();
+                        }
+                        let mut file = match File::create(file_path.join(&filename)) {
+                            Ok(file) => file,
+                            Err(e) => {
+                                let err_msg = format!(
+                                    "Failed to create archive document {}. {}",
+                                    &filename, e
+                                );
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+                        };
+                        file.write_all(&buffer[..]).unwrap();
+
+                        // log
+                        info!(target: "stdout", "file_id: {}, file_name: {}, size in bytes: {}", &id, &filename, size_in_bytes);
+
+                        let created_at =
+                            match SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
+                                Ok(n) => n.as_secs(),
+                                Err(_) => {
+                                    let err_msg = "Failed to get the current time.";
+
+                                    // log
+                                    error!(target: "stdout", "{}", err_msg);
+
+                                    return error::internal_server_error(err_msg);
+                                }
+                            };
+
+                        // create a file object
+                        image_request.control_image = Some(FileObject {
+                            id,
+                            bytes: size_in_bytes as u64,
+                            created_at,
+                            filename,
+                            object: "file".to_string(),
+                            purpose: "assistants".to_string(),
+                        });
+                    }
                     "seed" => match field.is_text() {
                         true => {
                             let mut seed = String::new();
