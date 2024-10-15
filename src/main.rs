@@ -58,9 +58,9 @@ struct Cli {
     /// Number of threads to use during computation. Default is -1, which means to use all available threads.
     #[arg(long, default_value = "-1")]
     threads: i32,
-    /// Context to create for the model.
+    /// Task type.
     #[arg(long, default_value = "full")]
-    context_type: ContextType,
+    task: TaskType,
     /// Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`.
     #[arg(long, default_value = None, value_parser = clap::value_parser!(SocketAddr), group = "socket_address_group")]
     socket_addr: Option<SocketAddr>,
@@ -96,8 +96,8 @@ async fn main() -> Result<(), ServerError> {
     // log model name
     info!(target: "stdout", "model_name: {}", cli.model_name);
 
-    // log context type
-    info!(target: "stdout", "context_type: {:?}", cli.context_type);
+    // log task type
+    info!(target: "stdout", "task: {:?}", &cli.task);
 
     // log control net
     let mut control_net_cpu = false;
@@ -125,7 +125,7 @@ async fn main() -> Result<(), ServerError> {
             cli.control_net.as_deref(),
             control_net_cpu,
             cli.threads,
-            cli.context_type.to_sd_context_type(),
+            cli.task.to_sd_context_type(),
         )
         .map_err(|e| ServerError::Operation(format!("{}", e)))?;
     } else if !cli.diffusion_model.is_empty() {
@@ -179,7 +179,7 @@ async fn main() -> Result<(), ServerError> {
             cli.control_net.as_deref(),
             control_net_cpu,
             cli.threads,
-            cli.context_type.to_sd_context_type(),
+            cli.task.to_sd_context_type(),
         )
         .map_err(|e| ServerError::Operation(format!("{}", e)))?;
     } else {
@@ -277,25 +277,25 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
     Ok(response)
 }
 
-/// The context to use for the model.
+/// Task type.
 #[derive(Clone, Debug, Copy, PartialEq, Eq, ValueEnum)]
-enum ContextType {
-    /// `text_to_image` context.
-    #[value(name = "text-to-image")]
+enum TaskType {
+    /// `text_to_image` task.
+    #[value(name = "text2image")]
     TextToImage,
-    /// `image_to_image` context.
-    #[value(name = "image-to-image")]
+    /// `image_to_image` task.
+    #[value(name = "image2image")]
     ImageToImage,
-    /// Both `text_to_image` and `image_to_image` contexts.
+    /// `text_to_image` and `image_to_image` tasks.
     #[value(name = "full")]
     Full,
 }
-impl ContextType {
+impl TaskType {
     fn to_sd_context_type(self) -> llama_core::SDContextType {
         match self {
-            ContextType::TextToImage => llama_core::SDContextType::TextToImage,
-            ContextType::ImageToImage => llama_core::SDContextType::ImageToImage,
-            ContextType::Full => llama_core::SDContextType::Full,
+            TaskType::TextToImage => llama_core::SDContextType::TextToImage,
+            TaskType::ImageToImage => llama_core::SDContextType::ImageToImage,
+            TaskType::Full => llama_core::SDContextType::Full,
         }
     }
 }
