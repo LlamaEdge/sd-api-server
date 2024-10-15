@@ -359,7 +359,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "chat-prompts"
 version = "0.17.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-support-sd-controlnet#bf7b0eed7799345c67e50ab805854beeadcd5ee4"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-support-sd-controlnet#694135ea10fe4a5267142647664d26a55122fcd0"
 dependencies = [
  "base64 0.22.1",
  "clap",
@@ -605,7 +605,7 @@ dependencies = [
 [[package]]
 name = "endpoints"
 version = "0.16.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-support-sd-controlnet#bf7b0eed7799345c67e50ab805854beeadcd5ee4"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-support-sd-controlnet#694135ea10fe4a5267142647664d26a55122fcd0"
 dependencies = [
  "indexmap",
  "serde",
@@ -1292,7 +1292,7 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 [[package]]
 name = "llama-core"
 version = "0.20.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-support-sd-controlnet#bf7b0eed7799345c67e50ab805854beeadcd5ee4"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-support-sd-controlnet#694135ea10fe4a5267142647664d26a55122fcd0"
 dependencies = [
  "base64 0.22.1",
  "chat-prompts",
