@@ -52,12 +52,18 @@ struct Cli {
     /// Path to control net model
     #[arg(long)]
     control_net: Option<String>,
-    /// Keep control net model on cpu
+    /// Keep controlnet on cpu (for low vram)
     #[arg(long, default_value = "false")]
     control_net_cpu: bool,
     /// Number of threads to use during computation. Default is -1, which means to use all available threads.
     #[arg(long, default_value = "-1")]
     threads: i32,
+    /// Keep clip on cpu (for low vram)
+    #[arg(long, default_value = "false")]
+    clip_on_cpu: bool,
+    /// Keep vae on cpu (for low vram)
+    #[arg(long, default_value = "false")]
+    vae_on_cpu: bool,
     /// Task type.
     #[arg(long, default_value = "full")]
     task: TaskType,
@@ -107,20 +113,21 @@ async fn main() -> Result<(), ServerError> {
     }
 
     // log control net
-    let mut control_net_cpu = false;
     if let Some(control_net) = &cli.control_net {
         info!(target: "stdout", "control_net: {}", &control_net);
-
-        if cli.control_net_cpu {
-            info!(target: "stdout", "control_net_cpu: true");
-            control_net_cpu = true;
-        } else {
-            info!(target: "stdout", "control_net_cpu: false");
-        }
     }
+
+    // log control net on cpu
+    info!(target: "stdout", "control_net_cpu: {}", cli.control_net_cpu);
 
     // log threads
     info!(target: "stdout", "threads: {}", cli.threads);
+
+    // log clip on cpu
+    info!(target: "stdout", "clip_on_cpu: {}", cli.clip_on_cpu);
+
+    // log vae on cpu
+    info!(target: "stdout", "vae_on_cpu: {}", cli.vae_on_cpu);
 
     // Determine which model option is set
     if !cli.model.is_empty() {
@@ -131,7 +138,9 @@ async fn main() -> Result<(), ServerError> {
             &cli.model,
             cli.lora_model_dir.as_deref(),
             cli.control_net.as_deref(),
-            control_net_cpu,
+            cli.control_net_cpu,
+            cli.clip_on_cpu,
+            cli.vae_on_cpu,
             cli.threads,
             cli.task.to_sd_context_type(),
         )
@@ -177,7 +186,9 @@ async fn main() -> Result<(), ServerError> {
             &cli.t5xxl,
             cli.lora_model_dir.as_deref(),
             cli.control_net.as_deref(),
-            control_net_cpu,
+            cli.control_net_cpu,
+            cli.clip_on_cpu,
+            cli.vae_on_cpu,
             cli.threads,
             cli.task.to_sd_context_type(),
         )
@@ -291,11 +302,11 @@ enum TaskType {
     Full,
 }
 impl TaskType {
-    fn to_sd_context_type(self) -> llama_core::SDContextType {
+    fn to_sd_context_type(self) -> llama_core::StableDiffusionTask {
         match self {
-            TaskType::TextToImage => llama_core::SDContextType::TextToImage,
-            TaskType::ImageToImage => llama_core::SDContextType::ImageToImage,
-            TaskType::Full => llama_core::SDContextType::Full,
+            TaskType::TextToImage => llama_core::StableDiffusionTask::TextToImage,
+            TaskType::ImageToImage => llama_core::StableDiffusionTask::ImageToImage,
+            TaskType::Full => llama_core::StableDiffusionTask::Full,
         }
     }
 }
