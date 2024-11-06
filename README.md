@@ -179,9 +179,17 @@ Options:
       --t5xxl <T5XXL>
           Path to the the t5xxl text encoder [default: ]
       --lora-model-dir <LORA_MODEL_DIR>
-          Path to the lora model directory [default: ]
+          Path to the lora model directory
+      --control-net <CONTROL_NET>
+          Path to control net model
+      --control-net-cpu
+          Keep controlnet on cpu (for low vram)
       --threads <THREADS>
           Number of threads to use during computation. Default is -1, which means to use all available threads [default: -1]
+      --clip-on-cpu
+          Keep clip on cpu (for low vram)
+      --vae-on-cpu
+          Keep vae on cpu (for low vram)
       --task <TASK>
           Task type [default: full] [possible values: text2image, image2image, full]
       --socket-addr <SOCKET_ADDR>
