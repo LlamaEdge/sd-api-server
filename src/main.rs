@@ -14,6 +14,7 @@ use hyper::{
     service::{make_service_fn, service_fn},
     Body, Request, Response, Server,
 };
+use once_cell::sync::OnceCell;
 use std::{net::SocketAddr, path::PathBuf};
 use tokio::net::TcpListener;
 use utils::LogLevel;
@@ -22,6 +23,9 @@ type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 // default port
 const DEFAULT_PORT: &str = "8080";
+
+// server info
+pub(crate) static SOCKET_ADDRESS: OnceCell<SocketAddr> = OnceCell::new();
 
 #[derive(Debug, Parser)]
 #[command(name = "LlamaEdge-StableDiffusion API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "LlamaEdge-Stable-Diffusion API Server")]
@@ -204,6 +208,13 @@ async fn main() -> Result<(), ServerError> {
         Some(addr) => addr,
         None => SocketAddr::from(([0, 0, 0, 0], cli.port)),
     };
+    if let Err(e) = SOCKET_ADDRESS.set(addr) {
+        let err_msg = format!("Failed to set SOCKET_ADDRESS: {}", e);
+
+        error!(target: "stdout", "{}", &err_msg);
+
+        return Err(ServerError::Operation(err_msg));
+    }
 
     let new_service = make_service_fn(move |conn: &AddrStream| {
         // log socket address
