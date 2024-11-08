@@ -24,7 +24,7 @@ type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 // default port
 const DEFAULT_PORT: &str = "8080";
 
-// server info
+// socket address
 pub(crate) static SOCKET_ADDRESS: OnceCell<SocketAddr> = OnceCell::new();
 
 #[derive(Debug, Parser)]

@@ -2051,9 +2051,8 @@ pub(crate) async fn image_variation_handler(req: Request<Body>) -> Response<Body
     res
 }
 
-/// Upload, download, retrieve and delete a file, or list all files.
+/// Download, retrieve and delete a file, or list all files.
 ///
-/// - `POST /v1/files`: Upload a file.
 /// - `GET /v1/files`: List all files.
 /// - `GET /v1/files/{file_id}`: Retrieve a file by id.
 /// - `GET /v1/files/{file_id}/content`: Retrieve the content of a file by id.
@@ -2064,52 +2063,7 @@ pub(crate) async fn files_handler(req: Request<Body>) -> Response<Body> {
     // log
     info!(target: "stdout", "Handling the coming files request");
 
-    let res = if req.method() == Method::POST {
-        match llama_core::files::upload_file(req).await {
-            Ok(fo) => {
-                // serialize chat completion object
-                let s = match serde_json::to_string(&fo) {
-                    Ok(s) => s,
-                    Err(e) => {
-                        let err_msg = format!("Failed to serialize file object. {}", e);
-
-                        // log
-                        error!(target: "stdout", "{}", &err_msg);
-
-                        return error::internal_server_error(err_msg);
-                    }
-                };
-
-                // return response
-                let result = Response::builder()
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Methods", "*")
-                    .header("Access-Control-Allow-Headers", "*")
-                    .header("Content-Type", "application/json")
-                    .body(Body::from(s));
-
-                match result {
-                    Ok(response) => response,
-                    Err(e) => {
-                        let err_msg = e.to_string();
-
-                        // log
-                        error!(target: "stdout", "{}", &err_msg);
-
-                        error::internal_server_error(err_msg)
-                    }
-                }
-            }
-            Err(e) => {
-                let err_msg = format!("{}", e);
-
-                // log
-                error!(target: "stdout", "{}", &err_msg);
-
-                error::internal_server_error(err_msg)
-            }
-        }
-    } else if req.method() == Method::GET {
+    let res = if req.method() == Method::GET {
         let uri_path = req.uri().path().trim_end_matches('/').to_lowercase();
 
         // Split the path into segments
