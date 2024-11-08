@@ -782,6 +782,11 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
     // log
     info!(target: "stdout", "Handling the coming image generation request");
 
+    let scheme_str = match is_https(&req) {
+        true => "https",
+        false => "http",
+    };
+
     if req.method().eq(&hyper::http::Method::OPTIONS) {
         let result = Response::builder()
             .header("Access-Control-Allow-Origin", "*")
@@ -1604,7 +1609,34 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
             info!(target: "stdout", "user: {}", image_request.user.clone().unwrap());
 
             match llama_core::images::image_edit(&mut image_request).await {
-                Ok(images_response) => {
+                Ok(mut images_response) => {
+                    if Some(ResponseFormat::Url) == image_request.response_format {
+                        for image_object in images_response.data.iter_mut() {
+                            let segments: Vec<&str> =
+                                image_object.url.as_ref().unwrap().split("/").collect();
+                            match segments.as_slice() {
+                                [_, _, id, ..] => {
+                                    // get the socket address of request
+                                    let socket_address = SOCKET_ADDRESS.get().unwrap();
+
+                                    image_object.url = Some(format!(
+                                        "{}://{}/v1/files/download/{}",
+                                        scheme_str, socket_address, id
+                                    ))
+                                }
+                                _ => {
+                                    let err_msg =
+                                        "Failed to parse the url from the image response.";
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::internal_server_error(err_msg);
+                                }
+                            }
+                        }
+                    }
+
                     match serde_json::to_string(&images_response) {
                         Ok(s) => {
                             // return response
