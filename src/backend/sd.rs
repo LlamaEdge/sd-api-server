@@ -1,4 +1,4 @@
-use crate::{error, utils::gen_image_id, SOCKET_ADDRESS};
+use crate::{error, utils::gen_image_id, DOWNLOAD_URL_PREFIX};
 use endpoints::{
     files::{DeleteFileStatus, FileObject},
     images::{ImageCreateRequest, ImageEditRequest, ImageVariationRequest, ResponseFormat},
@@ -16,11 +16,6 @@ use std::{
 pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response<Body> {
     // log
     info!(target: "stdout", "Handling the coming image generation request");
-
-    let scheme_str = match is_https(&req) {
-        true => "https",
-        false => "http",
-    };
 
     if req.method().eq(&hyper::http::Method::OPTIONS) {
         let result = Response::builder()
@@ -709,11 +704,20 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                     match segments.as_slice() {
                         [_, _, id, ..] => {
                             // get the socket address of request
-                            let socket_address = SOCKET_ADDRESS.get().unwrap();
+                            let download_url_prefix = DOWNLOAD_URL_PREFIX.get().unwrap();
+
+                            let host = match download_url_prefix.port() {
+                                Some(port) => {
+                                    format!("{}:{}", download_url_prefix.host_str().unwrap(), port)
+                                }
+                                None => download_url_prefix.host_str().unwrap().to_string(),
+                            };
 
                             image_object.url = Some(format!(
                                 "{}://{}/v1/files/download/{}",
-                                scheme_str, socket_address, id
+                                download_url_prefix.scheme(),
+                                host,
+                                id
                             ))
                         }
                         _ => {
@@ -781,11 +785,6 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
 pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
     // log
     info!(target: "stdout", "Handling the coming image generation request");
-
-    let scheme_str = match is_https(&req) {
-        true => "https",
-        false => "http",
-    };
 
     if req.method().eq(&hyper::http::Method::OPTIONS) {
         let result = Response::builder()
@@ -1617,11 +1616,24 @@ pub(crate) async fn image_edit_handler(req: Request<Body>) -> Response<Body> {
                             match segments.as_slice() {
                                 [_, _, id, ..] => {
                                     // get the socket address of request
-                                    let socket_address = SOCKET_ADDRESS.get().unwrap();
+                                    let download_url_prefix = DOWNLOAD_URL_PREFIX.get().unwrap();
+
+                                    let host = match download_url_prefix.port() {
+                                        Some(port) => {
+                                            format!(
+                                                "{}:{}",
+                                                download_url_prefix.host_str().unwrap(),
+                                                port
+                                            )
+                                        }
+                                        None => download_url_prefix.host_str().unwrap().to_string(),
+                                    };
 
                                     image_object.url = Some(format!(
                                         "{}://{}/v1/files/download/{}",
-                                        scheme_str, socket_address, id
+                                        download_url_prefix.scheme(),
+                                        host,
+                                        id
                                     ))
                                 }
                                 _ => {
@@ -2388,14 +2400,4 @@ fn download_file(id: impl AsRef<str>) -> Response<Body> {
             error::internal_server_error(err_msg)
         }
     }
-}
-
-fn is_https(req: &Request<Body>) -> bool {
-    // Check both URI scheme and forwarded proto header
-    req.uri().scheme_str() == Some("https")
-        || req
-            .headers()
-            .get("X-Forwarded-Proto")
-            .and_then(|h| h.to_str().ok())
-            == Some("https")
 }

@@ -20,6 +20,7 @@ use std::{
     path::PathBuf,
 };
 use tokio::net::TcpListener;
+use url::Url;
 use utils::LogLevel;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -28,7 +29,7 @@ type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 const DEFAULT_PORT: &str = "8080";
 
 // socket address
-pub(crate) static SOCKET_ADDRESS: OnceCell<SocketAddr> = OnceCell::new();
+pub(crate) static DOWNLOAD_URL_PREFIX: OnceCell<Url> = OnceCell::new();
 
 #[derive(Debug, Parser)]
 #[command(name = "LlamaEdge-StableDiffusion API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "LlamaEdge-Stable-Diffusion API Server")]
@@ -80,6 +81,9 @@ struct Cli {
     /// Port number
     #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16), group = "socket_address_group")]
     port: u16,
+    /// Download URL prefix
+    #[arg(long)]
+    download_url_prefix: Option<String>,
 }
 
 #[allow(clippy::needless_return)]
@@ -212,37 +216,78 @@ async fn main() -> Result<(), ServerError> {
         None => SocketAddr::from(([0, 0, 0, 0], cli.port)),
     };
 
-    // set SOCKET_ADDRESS
-    match addr.ip() {
-        IpAddr::V4(ip) => match ip.to_string().as_str() {
-            "0.0.0.0" => {
-                let ipv4_addr = SocketAddr::from(([127, 0, 0, 1], cli.port));
-                if let Err(e) = SOCKET_ADDRESS.set(ipv4_addr) {
-                    let err_msg = format!("Failed to set SOCKET_ADDRESS: {}", e);
+    match cli.download_url_prefix {
+        Some(download_url_prefix) => {
+            info!(target: "stdout", "download_url_prefix: {}", &download_url_prefix);
 
-                    error!(target: "stdout", "{}", &err_msg);
+            // download url prefix
+            info!(target: "stdout", "download_url_prefix: {}", &download_url_prefix);
+            let download_url_prefix = Url::parse(&download_url_prefix).map_err(|e| {
+                ServerError::Operation(format!(
+                    "Failed to parse `download_url_prefix` CLI option: {}",
+                    e
+                ))
+            })?;
+            if let Err(e) = DOWNLOAD_URL_PREFIX.set(download_url_prefix) {
+                let err_msg = format!("Failed to set DOWNLOAD_URL_PREFIX: {}", e);
 
-                    return Err(ServerError::Operation(err_msg));
+                error!(target: "stdout", "{}", &err_msg);
+
+                return Err(ServerError::Operation(err_msg));
+            }
+        }
+        None => {
+            match addr.ip() {
+                IpAddr::V4(ip) => match ip.to_string().as_str() {
+                    "0.0.0.0" => {
+                        let ipv4_addr_str = format!("http://localhost:{}", addr.port());
+
+                        info!(target: "stdout", "download_url_prefix: {}", ipv4_addr_str);
+
+                        let download_url_prefix = Url::parse(&ipv4_addr_str).map_err(|e| {
+                            ServerError::Operation(format!(
+                                "Failed to parse `download_url_prefix` CLI option: {}",
+                                e
+                            ))
+                        })?;
+                        if let Err(e) = DOWNLOAD_URL_PREFIX.set(download_url_prefix) {
+                            let err_msg = format!("Failed to set SOCKET_ADDRESS: {}", e);
+
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return Err(ServerError::Operation(err_msg));
+                        }
+                    }
+                    _ => {
+                        let ipv4_addr_str = format!("http://{}:{}", addr.ip(), addr.port());
+
+                        info!(target: "stdout", "download_url_prefix: {}", ipv4_addr_str);
+
+                        let download_url_prefix = Url::parse(&ipv4_addr_str).map_err(|e| {
+                            ServerError::Operation(format!(
+                                "Failed to parse `download_url_prefix` CLI option: {}",
+                                e
+                            ))
+                        })?;
+                        if let Err(e) = DOWNLOAD_URL_PREFIX.set(download_url_prefix) {
+                            let err_msg = format!("Failed to set SOCKET_ADDRESS: {}", e);
+
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return Err(ServerError::Operation(err_msg));
+                        }
+                    }
+                },
+                IpAddr::V6(_) => {
+                    let err_msg = "ipv6 is not supported";
+
+                    // log error
+                    error!(target: "stdout", "{}", err_msg);
+
+                    // return error
+                    return Err(ServerError::Operation(err_msg.into()));
                 }
             }
-            _ => {
-                if let Err(e) = SOCKET_ADDRESS.set(addr) {
-                    let err_msg = format!("Failed to set SOCKET_ADDRESS: {}", e);
-
-                    error!(target: "stdout", "{}", &err_msg);
-
-                    return Err(ServerError::Operation(err_msg));
-                }
-            }
-        },
-        IpAddr::V6(_) => {
-            let err_msg = "ipv6 is not supported";
-
-            // log error
-            error!(target: "stdout", "{}", err_msg);
-
-            // return error
-            return Err(ServerError::Operation(err_msg.into()));
         }
     }
 
