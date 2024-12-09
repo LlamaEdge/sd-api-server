@@ -15,7 +15,10 @@ use hyper::{
     Body, Request, Response, Server,
 };
 use once_cell::sync::OnceCell;
-use std::{net::SocketAddr, path::PathBuf};
+use std::{
+    net::{IpAddr, SocketAddr},
+    path::PathBuf,
+};
 use tokio::net::TcpListener;
 use utils::LogLevel;
 
@@ -208,12 +211,39 @@ async fn main() -> Result<(), ServerError> {
         Some(addr) => addr,
         None => SocketAddr::from(([0, 0, 0, 0], cli.port)),
     };
-    if let Err(e) = SOCKET_ADDRESS.set(addr) {
-        let err_msg = format!("Failed to set SOCKET_ADDRESS: {}", e);
 
-        error!(target: "stdout", "{}", &err_msg);
+    // set SOCKET_ADDRESS
+    match addr.ip() {
+        IpAddr::V4(ip) => match ip.to_string().as_str() {
+            "0.0.0.0" => {
+                let ipv4_addr = SocketAddr::from(([127, 0, 0, 1], cli.port));
+                if let Err(e) = SOCKET_ADDRESS.set(ipv4_addr) {
+                    let err_msg = format!("Failed to set SOCKET_ADDRESS: {}", e);
 
-        return Err(ServerError::Operation(err_msg));
+                    error!(target: "stdout", "{}", &err_msg);
+
+                    return Err(ServerError::Operation(err_msg));
+                }
+            }
+            _ => {
+                if let Err(e) = SOCKET_ADDRESS.set(addr) {
+                    let err_msg = format!("Failed to set SOCKET_ADDRESS: {}", e);
+
+                    error!(target: "stdout", "{}", &err_msg);
+
+                    return Err(ServerError::Operation(err_msg));
+                }
+            }
+        },
+        IpAddr::V6(_) => {
+            let err_msg = "ipv6 is not supported";
+
+            // log error
+            error!(target: "stdout", "{}", err_msg);
+
+            // return error
+            return Err(ServerError::Operation(err_msg.into()));
+        }
     }
 
     let new_service = make_service_fn(move |conn: &AddrStream| {
