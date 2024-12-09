@@ -196,6 +196,8 @@ Options:
           Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`
       --port <PORT>
           Port number [default: 8080]
+      --download-url-prefix <DOWNLOAD_URL_PREFIX>
+          Download URL prefix, format: `http(s)://{IPv4_address}:{port}` or `http(s)://{domain}:{port}`
   -h, --help
           Print help (see more with '--help')
   -V, --version
