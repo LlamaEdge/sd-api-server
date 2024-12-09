@@ -112,14 +112,14 @@ This project is a RESTful API server that provides image generation and editing 
     --form 'prompt="A cute baby sea otter with blue eyes"'
   ```
 
-  If the request is handled successfully, the server will return a JSON response like the following:
+  If the request is handled successfully, the server will return a JSON response like the below. To preview or download the generated image, copy and paste the URL to your browser.
 
   ```json
   {
     "created": 1723432689,
     "data": [
         {
-            "url": "/archives/file_554e4d53-6072-4988-83e6-fe684655a734/output.png",
+            "url": "http://localhost:8080/v1/files/download/file_554e4d53-6072-4988-83e6-fe684655a734"
             "prompt": "A cute baby sea otter with blue eyes"
         }
     ]
