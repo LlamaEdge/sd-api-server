@@ -617,7 +617,7 @@ dependencies = [
  "indexmap",
  "serde",
  "serde_json",
- "url 2.5.3",
+ "url 2.5.4",
 ]
 
 [[package]]
@@ -2290,7 +2290,7 @@ dependencies = [
  "tokio-rustls",
  "tokio-util",
  "tower-service",
- "url 2.5.3",
+ "url 2.5.4",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-streams",
@@ -2432,6 +2432,7 @@ dependencies = [
  "serde_json",
  "thiserror",
  "tokio",
+ "url 2.5.4",
  "uuid",
  "wasi-logger",
 ]
@@ -3190,9 +3191,9 @@ dependencies = [
 
 [[package]]
 name = "url"
-version = "2.5.3"
+version = "2.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d157f1b96d14500ffdc1f10ba712e780825526c03d9a49b4d0324b0d9113ada"
+checksum = "32f8b686cadd1473f4bd0117a5d28d36b1ade384ea9b5069a1c40aefed7fda60"
 dependencies = [
  "form_urlencoded",
  "idna 1.0.3",
