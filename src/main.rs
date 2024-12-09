@@ -81,7 +81,7 @@ struct Cli {
     /// Port number
     #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16), group = "socket_address_group")]
     port: u16,
-    /// Download URL prefix
+    /// Download URL prefix, format: `http(s)://{IPv4_address}:{port}` or `http(s)://{domain}:{port}`
     #[arg(long)]
     download_url_prefix: Option<String>,
 }
@@ -216,6 +216,7 @@ async fn main() -> Result<(), ServerError> {
         None => SocketAddr::from(([0, 0, 0, 0], cli.port)),
     };
 
+    // set DOWNLOAD_URL_PREFIX
     match cli.download_url_prefix {
         Some(download_url_prefix) => {
             info!(target: "stdout", "download_url_prefix: {}", &download_url_prefix);
