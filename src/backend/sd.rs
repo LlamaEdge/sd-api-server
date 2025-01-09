@@ -702,7 +702,7 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                     let segments: Vec<&str> =
                         image_object.url.as_ref().unwrap().split("/").collect();
                     match segments.as_slice() {
-                        [_, _, id, ..] => {
+                        [_, _, id, filename] => {
                             // get the socket address of request
                             let download_url_prefix = DOWNLOAD_URL_PREFIX.get().unwrap();
 
@@ -713,12 +713,17 @@ pub(crate) async fn image_generation_handler(mut req: Request<Body>) -> Response
                                 None => download_url_prefix.host_str().unwrap().to_string(),
                             };
 
-                            image_object.url = Some(format!(
-                                "{}://{}/v1/files/download/{}",
+                            let url = format!(
+                                "{}://{}/v1/files/download/{}/{}",
                                 download_url_prefix.scheme(),
                                 host,
-                                id
-                            ))
+                                id,
+                                filename
+                            );
+
+                            info!(target: "stdout", "url: {}", url);
+
+                            image_object.url = Some(url);
                         }
                         _ => {
                             let err_msg = "Failed to parse the url from the image response.";
