@@ -2112,7 +2112,7 @@ pub(crate) async fn files_handler(req: Request<Body>) -> Response<Body> {
 
                 retrieve_file(file_id)
             }
-            ["", "v1", "files", "download", file_id] => download_file(file_id),
+            ["", "v1", "files", "download", file_id, _file_name] => download_file(file_id),
             _ => {
                 let err_msg = format!("unsupported uri path: {}", uri_path);
 
