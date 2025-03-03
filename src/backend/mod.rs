@@ -10,6 +10,8 @@ pub(crate) async fn handle_sd_request(req: Request<Body>) -> Response<Body> {
         "/v1/images/generations" => sd::image_generation_handler(req).await,
         "/v1/images/edits" => sd::image_edit_handler(req).await,
         "/v1/images/variations" => sd::image_variation_handler(req).await,
+        "/v1/models" => sd::models_handler().await,
+        "/v1/info" => sd::server_info_handler().await,
         path => {
             if path.starts_with("/v1/files") {
                 sd::files_handler(req).await

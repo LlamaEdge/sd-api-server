@@ -1,7 +1,8 @@
-use crate::{error, utils::gen_image_id, DOWNLOAD_URL_PREFIX};
+use crate::{error, utils::gen_image_id, DOWNLOAD_URL_PREFIX, SERVER_INFO};
 use endpoints::{
     files::{DeleteFileStatus, FileObject},
     images::{ImageCreateRequest, ImageEditRequest, ImageVariationRequest, ResponseFormat},
+    models::{ListModelsResponse, Model},
 };
 use hyper::{body::to_bytes, header::CONTENT_TYPE, Body, Method, Request, Response};
 use multipart::server::{Multipart, ReadEntry, ReadEntryResult};
@@ -2405,4 +2406,124 @@ fn download_file(id: impl AsRef<str>) -> Response<Body> {
             error::internal_server_error(err_msg)
         }
     }
+}
+
+pub(crate) async fn server_info_handler() -> Response<Body> {
+    // log
+    info!(target: "stdout", "Handling the coming server info request.");
+
+    // get the server info
+    let server_info = match SERVER_INFO.get() {
+        Some(server_info) => server_info,
+        None => {
+            let err_msg = "The server info is not set.";
+
+            // log
+            error!(target: "stdout", "{}", &err_msg);
+
+            return error::internal_server_error("The server info is not set.");
+        }
+    };
+
+    // serialize server info
+    let s = match serde_json::to_string(&server_info) {
+        Ok(s) => s,
+        Err(e) => {
+            let err_msg = format!("Fail to serialize server info. {}", e);
+
+            // log
+            error!(target: "stdout", "{}", &err_msg);
+
+            return error::internal_server_error(err_msg);
+        }
+    };
+
+    // return response
+    let result = Response::builder()
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Methods", "*")
+        .header("Access-Control-Allow-Headers", "*")
+        .header("Content-Type", "application/json")
+        .body(Body::from(s));
+    let res = match result {
+        Ok(response) => response,
+        Err(e) => {
+            let err_msg = e.to_string();
+
+            // log
+            error!(target: "stdout", "{}", &err_msg);
+
+            error::internal_server_error(err_msg)
+        }
+    };
+
+    info!(target: "stdout", "Send the server info response.");
+
+    res
+}
+
+/// List all models available.
+pub(crate) async fn models_handler() -> Response<Body> {
+    // log
+    info!(target: "stdout", "Handling the coming model list request.");
+
+    // get the model name
+    let model_name = SERVER_INFO
+        .get()
+        .unwrap()
+        .image_model
+        .as_ref()
+        .unwrap()
+        .name
+        .clone();
+
+    let list_models_response = ListModelsResponse {
+        object: String::from("list"),
+        data: vec![Model {
+            id: model_name,
+            created: SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+            object: String::from("model"),
+            owned_by: String::from("Not specified"),
+        }],
+    };
+
+    // serialize response
+    let s = match serde_json::to_string(&list_models_response) {
+        Ok(s) => s,
+        Err(e) => {
+            let err_msg = format!("Failed to serialize the model list result. Reason: {}", e);
+
+            // log
+            error!(target: "stdout", "{}", &err_msg);
+
+            return error::internal_server_error(err_msg);
+        }
+    };
+
+    // return response
+    let result = Response::builder()
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Methods", "*")
+        .header("Access-Control-Allow-Headers", "*")
+        .header("Content-Type", "application/json")
+        .body(Body::from(s));
+    let res = match result {
+        Ok(response) => response,
+        Err(e) => {
+            let err_msg = format!("Failed to get model list. Reason: {}", e);
+
+            // log
+            error!(target: "stdout", "{}", &err_msg);
+
+            error::internal_server_error(err_msg)
+        }
+    };
+
+    // log
+    info!(target: "stdout", "Send the model list response.");
+
+    res
 }

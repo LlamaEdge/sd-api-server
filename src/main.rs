@@ -15,7 +15,9 @@ use hyper::{
     Body, Request, Response, Server,
 };
 use once_cell::sync::OnceCell;
+use serde::{Deserialize, Serialize};
 use std::{
+    collections::HashMap,
     net::{IpAddr, SocketAddr},
     path::PathBuf,
 };
@@ -24,6 +26,9 @@ use url::Url;
 use utils::LogLevel;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
+
+// server info
+pub(crate) static SERVER_INFO: OnceCell<ApiServer> = OnceCell::new();
 
 // default port
 const DEFAULT_PORT: &str = "8080";
@@ -229,6 +234,23 @@ async fn main() -> Result<(), ServerError> {
         None => SocketAddr::from(([0, 0, 0, 0], cli.port)),
     };
 
+    // create server info
+    let server_info = ApiServer {
+        ty: "sd".to_string(),
+        version: env!("CARGO_PKG_VERSION").to_string(),
+        plugin_version: "Unknown".to_string(),
+        port: addr.port().to_string(),
+        image_model: Some(ModelConfig {
+            name: cli.model_name,
+            ty: "image".to_string(),
+            ..Default::default()
+        }),
+        extras: HashMap::new(),
+    };
+    SERVER_INFO
+        .set(server_info)
+        .map_err(|_| ServerError::Operation("Failed to set `SERVER_INFO`.".to_string()))?;
+
     // set DOWNLOAD_URL_PREFIX
     match cli.download_url_prefix {
         Some(download_url_prefix) => {
@@ -432,4 +454,53 @@ impl TaskType {
             TaskType::Full => llama_core::StableDiffusionTask::Full,
         }
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct ApiServer {
+    #[serde(rename = "type")]
+    ty: String,
+    version: String,
+    #[serde(rename = "ggml_plugin_version")]
+    plugin_version: String,
+    port: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    image_model: Option<ModelConfig>,
+    extras: HashMap<String, String>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub(crate) struct ModelConfig {
+    // model name
+    name: String,
+    // type: image
+    #[serde(rename = "type")]
+    ty: String,
+    pub ctx_size: u64,
+    pub batch_size: u64,
+    pub ubatch_size: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub n_predict: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reverse_prompt: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub n_gpu_layers: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub use_mmap: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub temperature: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub top_p: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repeat_penalty: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub presence_penalty: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub frequency_penalty: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub split_mode: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub main_gpu: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tensor_split: Option<String>,
 }
